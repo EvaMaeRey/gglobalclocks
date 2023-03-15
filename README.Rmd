@@ -20,7 +20,7 @@ knitr::opts_chunk$set(
 library(tidyverse)
 library(lubridate)
 
-ymd_hms("2009-08-07 11:00:00", 
+ymd_hms("2023-04-08 11:00:00", 
         tz = "America/New_York") ->
   meeting
 
@@ -54,14 +54,15 @@ df
 df %>% 
   mutate(minute_turn = local_time %>% lubridate::minute() %% 60 / 60) %>% 
   mutate(hour_turn = local_time %>% lubridate::hour() %% 12/12 + minute_turn/12) %>% 
-  mutate(pm = local_time %>% lubridate::hour() > 12) %>% 
+  mutate(am_pm = ifelse(local_time %>% lubridate::hour() > 12, "pm", "am")) %>% 
   ggplot() + 
   facet_wrap(~locations) + 
   aes(x =  hour_turn, 
       xend =  hour_turn,
       y = 0,
       yend = .6,
-      color = pm) + 
+      color = am_pm) + 
+  labs(color = NULL) +
   geom_segment() + 
   geom_segment(aes(x =  minute_turn, 
                   xend =  minute_turn ,
