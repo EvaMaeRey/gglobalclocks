@@ -5,19 +5,19 @@
 
 ``` r
 library(tidyverse)
-#> ── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
-#> ✔ dplyr     1.1.0     ✔ readr     2.1.4
-#> ✔ forcats   1.0.0     ✔ stringr   1.5.0
-#> ✔ ggplot2   3.4.1     ✔ tibble    3.2.0
-#> ✔ lubridate 1.9.2     ✔ tidyr     1.3.0
-#> ✔ purrr     1.0.1     
-#> ── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-#> ✖ dplyr::filter() masks stats::filter()
-#> ✖ dplyr::lag()    masks stats::lag()
-#> ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+── Attaching core tidyverse packages ──────────────────────── tidyverse 2.0.0 ──
+✔ dplyr     1.1.0     ✔ readr     2.1.4
+✔ forcats   1.0.0     ✔ stringr   1.5.0
+✔ ggplot2   3.4.1     ✔ tibble    3.2.0
+✔ lubridate 1.9.2     ✔ tidyr     1.3.0
+✔ purrr     1.0.1     
+── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
+✖ dplyr::filter() masks stats::filter()
+✖ dplyr::lag()    masks stats::lag()
+ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
 library(lubridate)
 
-ymd_hms("2023-08-19 09:00:00", 
+ymd_hms("2023-09-02 09:00:00", 
         tz = "America/New_York") ->
   meeting
 
@@ -37,7 +37,18 @@ OlsonNames() %>%
   group_by(local_time) %>%
   summarise(locations = paste(tz, collapse = "\n")) %>% 
   mutate(day = as_date(local_time) %>% wday(label = T)) ->
-df
+df; df
+# A tibble: 8 × 3
+  local_time          locations                                           day  
+  <chr>               <chr>                                               <ord>
+1 2023-09-02 06:00:00 "US/Pacific"                                        Sat  
+2 2023-09-02 07:00:00 "Canada/Mountain\nUS/Mountain"                      Sat  
+3 2023-09-02 08:00:00 "US/Central"                                        Sat  
+4 2023-09-02 09:00:00 "US/Eastern"                                        Sat  
+5 2023-09-02 14:00:00 "Europe/London"                                     Sat  
+6 2023-09-02 15:00:00 "Europe/Amsterdam\nEurope/Stockholm\nEurope/Vienna" Sat  
+7 2023-09-02 22:30:00 "Australia/Adelaide"                                Sat  
+8 2023-09-02 23:00:00 "Australia/Sydney"                                  Sat  
 
 # df %>% 
 #   ggplot() + 
@@ -159,27 +170,27 @@ df |> compute_clock_hands()
 #> # A tibble: 8 × 6
 #>   local_time          locations                      day   minut…¹ hour_…² am_pm
 #>   <chr>               <chr>                          <ord>   <dbl>   <dbl> <chr>
-#> 1 2023-08-19 06:00:00 "US/Pacific"                   Sat       0     0.5   am   
-#> 2 2023-08-19 07:00:00 "Canada/Mountain\nUS/Mountain" Sat       0     0.583 am   
-#> 3 2023-08-19 08:00:00 "US/Central"                   Sat       0     0.667 am   
-#> 4 2023-08-19 09:00:00 "US/Eastern"                   Sat       0     0.75  am   
-#> 5 2023-08-19 14:00:00 "Europe/London"                Sat       0     0.167 pm   
-#> 6 2023-08-19 15:00:00 "Europe/Amsterdam\nEurope/Sto… Sat       0     0.25  pm   
-#> 7 2023-08-19 22:30:00 "Australia/Adelaide"           Sat       0.5   0.875 pm   
-#> 8 2023-08-19 23:00:00 "Australia/Sydney"             Sat       0     0.917 pm   
+#> 1 2023-09-02 06:00:00 "US/Pacific"                   Sat       0     0.5   am   
+#> 2 2023-09-02 07:00:00 "Canada/Mountain\nUS/Mountain" Sat       0     0.583 am   
+#> 3 2023-09-02 08:00:00 "US/Central"                   Sat       0     0.667 am   
+#> 4 2023-09-02 09:00:00 "US/Eastern"                   Sat       0     0.75  am   
+#> 5 2023-09-02 14:00:00 "Europe/London"                Sat       0     0.167 pm   
+#> 6 2023-09-02 15:00:00 "Europe/Amsterdam\nEurope/Sto… Sat       0     0.25  pm   
+#> 7 2023-09-02 22:30:00 "Australia/Adelaide"           Sat       0.5   0.875 pm   
+#> 8 2023-09-02 23:00:00 "Australia/Sydney"             Sat       0     0.917 pm   
 #> # … with abbreviated variable names ¹​minute_turn, ²​hour_turn
 df |> compute_minute_hand()
 #> # A tibble: 8 × 10
 #>   local_time         locat…¹ day   minut…² hour_…³ am_pm     x  xend     y  yend
 #>   <chr>              <chr>   <ord>   <dbl>   <dbl> <chr> <dbl> <dbl> <dbl> <dbl>
-#> 1 2023-08-19 06:00:… "US/Pa… Sat       0     0.5   am      0     0       0     1
-#> 2 2023-08-19 07:00:… "Canad… Sat       0     0.583 am      0     0       0     1
-#> 3 2023-08-19 08:00:… "US/Ce… Sat       0     0.667 am      0     0       0     1
-#> 4 2023-08-19 09:00:… "US/Ea… Sat       0     0.75  am      0     0       0     1
-#> 5 2023-08-19 14:00:… "Europ… Sat       0     0.167 pm      0     0       0     1
-#> 6 2023-08-19 15:00:… "Europ… Sat       0     0.25  pm      0     0       0     1
-#> 7 2023-08-19 22:30:… "Austr… Sat       0.5   0.875 pm      0.5   0.5     0     1
-#> 8 2023-08-19 23:00:… "Austr… Sat       0     0.917 pm      0     0       0     1
+#> 1 2023-09-02 06:00:… "US/Pa… Sat       0     0.5   am      0     0       0     1
+#> 2 2023-09-02 07:00:… "Canad… Sat       0     0.583 am      0     0       0     1
+#> 3 2023-09-02 08:00:… "US/Ce… Sat       0     0.667 am      0     0       0     1
+#> 4 2023-09-02 09:00:… "US/Ea… Sat       0     0.75  am      0     0       0     1
+#> 5 2023-09-02 14:00:… "Europ… Sat       0     0.167 pm      0     0       0     1
+#> 6 2023-09-02 15:00:… "Europ… Sat       0     0.25  pm      0     0       0     1
+#> 7 2023-09-02 22:30:… "Austr… Sat       0.5   0.875 pm      0.5   0.5     0     1
+#> 8 2023-09-02 23:00:… "Austr… Sat       0     0.917 pm      0     0       0     1
 #> # … with abbreviated variable names ¹​locations, ²​minute_turn, ³​hour_turn
 
 
