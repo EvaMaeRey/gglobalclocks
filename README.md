@@ -449,6 +449,11 @@ gglobalclocks <- function(data = NULL){
 }
 
 gglobalclocks()
+```
+
+<img src="man/figures/README-unnamed-chunk-20-1.png" width="100%" />
+
+``` r
 
 stamp_clockface <- function(){
   
@@ -463,6 +468,11 @@ stamp_clockface <- function(){
 }
 
 gglobalclocks() + stamp_clockface()
+```
+
+<img src="man/figures/README-unnamed-chunk-20-2.png" width="100%" />
+
+``` r
 
 compute_clock_hands <- function(data){
   
@@ -497,7 +507,46 @@ compute_minute_hand <- function(data, scales){
 }
 
 date_time_tz_to_tzs() |> compute_clock_hands()
+#> # A tibble: 15 × 8
+#>    tz           local_time_date_utc local_time local_date local_wday minute_turn
+#>    <chr>        <dttm>              <time>     <date>     <ord>            <dbl>
+#>  1 US/Pacific   2024-03-27 11:00:00 11:00      2024-03-27 Wed                0  
+#>  2 US/Mountain  2024-03-27 12:00:00 12:00      2024-03-27 Wed                0  
+#>  3 US/Central   2024-03-27 13:00:00 13:00      2024-03-27 Wed                0  
+#>  4 US/Eastern   2024-03-27 14:00:00 14:00      2024-03-27 Wed                0  
+#>  5 America/Bue… 2024-03-27 15:00:00 15:00      2024-03-27 Wed                0  
+#>  6 America/San… 2024-03-27 15:00:00 15:00      2024-03-27 Wed                0  
+#>  7 America/Sao… 2024-03-27 15:00:00 15:00      2024-03-27 Wed                0  
+#>  8 Europe/Lond… 2024-03-27 18:00:00 18:00      2024-03-27 Wed                0  
+#>  9 Europe/Amst… 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  
+#> 10 Europe/Paris 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  
+#> 11 Europe/Stoc… 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  
+#> 12 Europe/Vien… 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  
+#> 13 Australia/A… 2024-03-28 04:30:00 04:30      2024-03-28 Thu                0.5
+#> 14 Australia/M… 2024-03-28 05:00:00 05:00      2024-03-28 Thu                0  
+#> 15 Australia/S… 2024-03-28 05:00:00 05:00      2024-03-28 Thu                0  
+#> # ℹ 2 more variables: hour_turn <dbl>, am_pm <chr>
 date_time_tz_to_tzs() |> compute_minute_hand()
+#> # A tibble: 15 × 12
+#>    tz           local_time_date_utc local_time local_date local_wday minute_turn
+#>    <chr>        <dttm>              <time>     <date>     <ord>            <dbl>
+#>  1 US/Pacific   2024-03-27 11:00:00 11:00      2024-03-27 Wed                0  
+#>  2 US/Mountain  2024-03-27 12:00:00 12:00      2024-03-27 Wed                0  
+#>  3 US/Central   2024-03-27 13:00:00 13:00      2024-03-27 Wed                0  
+#>  4 US/Eastern   2024-03-27 14:00:00 14:00      2024-03-27 Wed                0  
+#>  5 America/Bue… 2024-03-27 15:00:00 15:00      2024-03-27 Wed                0  
+#>  6 America/San… 2024-03-27 15:00:00 15:00      2024-03-27 Wed                0  
+#>  7 America/Sao… 2024-03-27 15:00:00 15:00      2024-03-27 Wed                0  
+#>  8 Europe/Lond… 2024-03-27 18:00:00 18:00      2024-03-27 Wed                0  
+#>  9 Europe/Amst… 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  
+#> 10 Europe/Paris 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  
+#> 11 Europe/Stoc… 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  
+#> 12 Europe/Vien… 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  
+#> 13 Australia/A… 2024-03-28 04:30:00 04:30      2024-03-28 Thu                0.5
+#> 14 Australia/M… 2024-03-28 05:00:00 05:00      2024-03-28 Thu                0  
+#> 15 Australia/S… 2024-03-28 05:00:00 05:00      2024-03-28 Thu                0  
+#> # ℹ 6 more variables: hour_turn <dbl>, am_pm <chr>, x <dbl>, xend <dbl>,
+#> #   y <dbl>, yend <dbl>
 
 
 statClockminhand <- ggproto(`_class` = "statClockminhand",
@@ -562,6 +611,13 @@ gglobalclocks() +
   geom_minute_hand() +
   geom_hour_hand() +
   facet_wrap(~locations)
+#> `summarise()` has grouped output by 'local_time', 'local_date'. You can
+#> override using the `.groups` argument.
+```
+
+<img src="man/figures/README-unnamed-chunk-20-3.png" width="100%" />
+
+``` r
 
 geom_clock_hands <- function(...){
   
@@ -577,4 +633,8 @@ date_time_tz_to_tzs() |>
   stamp_clockface() + 
   geom_clock_hands() + 
   facet_wrap(~locations)
+#> `summarise()` has grouped output by 'local_time', 'local_date'. You can
+#> override using the `.groups` argument.
 ```
+
+<img src="man/figures/README-unnamed-chunk-20-4.png" width="100%" />

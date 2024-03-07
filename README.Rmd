@@ -384,7 +384,7 @@ gglobalclocks() + # wraps up theme void and coord_polar
  
 # returning to the actual global clocks idea.
 
-```{r eval = F}
+```{r eval = T}
 gglobalclocks <- function(data = NULL){
   
   ggplot(data) + 
