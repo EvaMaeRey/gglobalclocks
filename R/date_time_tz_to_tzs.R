@@ -32,6 +32,7 @@ OlsonNames() %>%
   dplyr::mutate(local_date = as.Date(local_date_time_chr)) %>%
   dplyr::mutate(local_wday = lubridate::wday(local_date, label = T)) %>%
   dplyr::arrange(local_date, local_time) %>%
-  dplyr::select(-local_date_time_chr)
+  dplyr::select(-local_date_time_chr) %>%
+  dplyr::mutate(local_wday_date = paste0(local_wday, ", ", month(local_date, label = T), " ", day(local_date)))
 
 }

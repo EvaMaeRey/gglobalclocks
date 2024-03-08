@@ -9,22 +9,92 @@ experimental](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](h
 
 # gglobalclocks
 
+What if you could draw a beautiful ‘wall’ of clocks with local times
+from around the world? Well, gglobalclocks lets you do that\!
+
+I worked on the wall of clocks thinking it might help me schedule
+virtual meetings with participant from around the world. Does a
+beautiful wall of clocks help schedule global meetings? As it turns out,
+in my experience, not really\!
+
+But gglobalclocks also has utilities for building dataframes of
+locations and local times which I have found helpful for multi-timezone
+scheduling.
+
 ``` r
 library(tidyverse)
-── Attaching core tidyverse packages ─────────────────── tidyverse 2.0.0.9000 ──
-✔ dplyr     1.1.0          ✔ readr     2.1.4     
-✔ forcats   1.0.0          ✔ stringr   1.5.0     
-✔ ggplot2   3.4.4.9000     ✔ tibble    3.2.1     
-✔ lubridate 1.9.2          ✔ tidyr     1.3.0     
-✔ purrr     1.0.1          
-── Conflicts ────────────────────────────────────────── tidyverse_conflicts() ──
-✖ dplyr::filter() masks stats::filter()
-✖ dplyr::lag()    masks stats::lag()
-ℹ Use the conflicted package (<http://conflicted.r-lib.org/>) to force all conflicts to become errors
+gglobalclocks:::date_time_tz_to_tzs() |> 
+  gglobalclocks:::local_tzs_df_collapse() |>
+  gglobalclocks:::gglobalclocks() + 
+    aes(local_time = local_time) + 
+    gglobalclocks:::stamp_clockface() + 
+    gglobalclocks:::geom_clock_hands() + 
+    facet_wrap(~str_wrap(locations, 20))
+```
+
+<img src="man/figures/README-unnamed-chunk-2-1.png" width="100%" />
+
+``` r
+  
+gglobalclocks:::date_time_tz_to_tzs() |> 
+  head()
+#> # A tibble: 6 × 6
+#>   tz        local_time_date_utc local_time local_date local_wday local_wday_date
+#>   <chr>     <dttm>              <time>     <date>     <ord>      <chr>          
+#> 1 US/Pacif… 2024-03-27 11:00:00 11:00      2024-03-27 Wed        Wed, Mar 27    
+#> 2 US/Mount… 2024-03-27 12:00:00 12:00      2024-03-27 Wed        Wed, Mar 27    
+#> 3 US/Centr… 2024-03-27 13:00:00 13:00      2024-03-27 Wed        Wed, Mar 27    
+#> 4 US/Easte… 2024-03-27 14:00:00 14:00      2024-03-27 Wed        Wed, Mar 27    
+#> 5 America/… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27    
+#> 6 America/… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27
+
+gglobalclocks:::date_time_tz_to_tzs() |> 
+  gglobalclocks:::local_tzs_df_collapse()
+#> # A tibble: 9 × 3
+#>   locations                           local_time local_wday_date
+#>   <chr>                               <time>     <chr>          
+#> 1 Adelaide                            04:30      Thu, Mar 28    
+#> 2 Melbourne; Sydney                   05:00      Thu, Mar 28    
+#> 3 US/Pacific                          11:00      Wed, Mar 27    
+#> 4 US/Mountain                         12:00      Wed, Mar 27    
+#> 5 US/Central                          13:00      Wed, Mar 27    
+#> 6 US/Eastern                          14:00      Wed, Mar 27    
+#> 7 Buenos_Aires; Santiago; Sao_Paulo   15:00      Wed, Mar 27    
+#> 8 London                              18:00      Wed, Mar 27    
+#> 9 Amsterdam; Paris; Stockholm; Vienna 19:00      Wed, Mar 27
+
+gglobalclocks:::date_time_tz_to_tzs(
+  from_date_time = "2024-03-06 12:00:00",
+  from_tz = "US/Mountain",
+  to_tz = c("US/Mountain", "Europe/Paris", "America/Sao_Paulo")
+  ) |> 
+  gglobalclocks:::local_tzs_df_collapse() |>  
+  ggplot() + 
+  gglobalclocks:::stamp_workday() +
+  aes(local_time, locations) + 
+  geom_point() +
+  geom_text(aes(label = local_time)) + 
+  aes(color = local_wday_date)
+```
+
+<img src="man/figures/README-unnamed-chunk-2-2.png" width="100%" />
+
+``` r
+library(tidyverse)
 library(lubridate)
 ```
 
+-----
+
+## Part II. Functions discussion and definitions
+
 ### `time_to_local()`
+
+One helper function to do translation from one time zone to multiple
+time zones is time\_to\_local. From working on global clocks, it seems
+like you can’t keep date-times with different time zones in one vector
+(or variable), so you need to do a conversion one by one and save a
+character version of the complete time zone information.
 
 ``` r
 time_to_local <- function(x, tz){
@@ -34,6 +104,10 @@ time_to_local <- function(x, tz){
 ```
 
 ### `date_time_tz_to_tzs()`
+
+We can use the converter above to translate from a ‘from’ location and
+time to a bunch of locations’ local times. We do this and then add a few
+more helpful columns like local\_time, local\_date etc.
 
 ``` r
 date_time_tz_to_tzs <- function(from_date_time = "2024-03-27 12:00:00", 
@@ -70,18 +144,36 @@ OlsonNames() %>%
   dplyr::mutate(local_date = as.Date(local_date_time_chr)) %>%
   dplyr::mutate(local_wday = lubridate::wday(local_date, label = T)) %>%
   dplyr::arrange(local_date, local_time) %>%
-  dplyr::select(-local_date_time_chr)
+  dplyr::select(-local_date_time_chr) %>%
+  dplyr::mutate(local_wday_date = paste0(local_wday, ", ", month(local_date, label = T), " ", day(local_date)))
 
 }
 ```
 
+``` r
+date_time_tz_to_tzs() |>
+  head()
+#> # A tibble: 6 × 6
+#>   tz        local_time_date_utc local_time local_date local_wday local_wday_date
+#>   <chr>     <dttm>              <time>     <date>     <ord>      <chr>          
+#> 1 US/Pacif… 2024-03-27 11:00:00 11:00      2024-03-27 Wed        Wed, Mar 27    
+#> 2 US/Mount… 2024-03-27 12:00:00 12:00      2024-03-27 Wed        Wed, Mar 27    
+#> 3 US/Centr… 2024-03-27 13:00:00 13:00      2024-03-27 Wed        Wed, Mar 27    
+#> 4 US/Easte… 2024-03-27 14:00:00 14:00      2024-03-27 Wed        Wed, Mar 27    
+#> 5 America/… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27    
+#> 6 America/… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27
+```
+
 ### `local_tzs_df_collapse()`
+
+If it turns out that you have multiple tz with the same local meeting
+time, you can collapse these locations by local time.
 
 ``` r
 local_tzs_df_collapse <- function(local_tzs_df, collapse = "; "){
   
   local_tzs_df |>
-    group_by(local_time, local_date, local_wday) |>
+    group_by(local_time, local_wday_date) |>
     summarise(locations = paste(tz, collapse = collapse)) |>
     ungroup() |>
     select(locations, everything()) |>
@@ -90,58 +182,52 @@ local_tzs_df_collapse <- function(local_tzs_df, collapse = "; "){
 }
 ```
 
-``` r
-date_time_tz_to_tzs() |>
-  head()
-#> # A tibble: 6 × 5
-#>   tz                   local_time_date_utc local_time local_date local_wday
-#>   <chr>                <dttm>              <time>     <date>     <ord>     
-#> 1 US/Pacific           2024-03-27 11:00:00 11:00      2024-03-27 Wed       
-#> 2 US/Mountain          2024-03-27 12:00:00 12:00      2024-03-27 Wed       
-#> 3 US/Central           2024-03-27 13:00:00 13:00      2024-03-27 Wed       
-#> 4 US/Eastern           2024-03-27 14:00:00 14:00      2024-03-27 Wed       
-#> 5 America/Buenos_Aires 2024-03-27 15:00:00 15:00      2024-03-27 Wed       
-#> 6 America/Santiago     2024-03-27 15:00:00 15:00      2024-03-27 Wed
+This is the type of information you might send to an attendees list so
+they can know, at a glance, their likelihood of making attending work.
 
+``` r
 date_time_tz_to_tzs() |> 
   local_tzs_df_collapse() |> 
   head()
-#> `summarise()` has grouped output by 'local_time', 'local_date'. You can
-#> override using the `.groups` argument.
-#> # A tibble: 6 × 4
-#>   locations         local_time local_date local_wday
-#>   <chr>             <time>     <date>     <ord>     
-#> 1 Adelaide          04:30      2024-03-28 Thu       
-#> 2 Melbourne; Sydney 05:00      2024-03-28 Thu       
-#> 3 US/Pacific        11:00      2024-03-27 Wed       
-#> 4 US/Mountain       12:00      2024-03-27 Wed       
-#> 5 US/Central        13:00      2024-03-27 Wed       
-#> 6 US/Eastern        14:00      2024-03-27 Wed
+#> `summarise()` has grouped output by 'local_time'. You can override using the
+#> `.groups` argument.
+#> # A tibble: 6 × 3
+#>   locations         local_time local_wday_date
+#>   <chr>             <time>     <chr>          
+#> 1 Adelaide          04:30      Thu, Mar 28    
+#> 2 Melbourne; Sydney 05:00      Thu, Mar 28    
+#> 3 US/Pacific        11:00      Wed, Mar 27    
+#> 4 US/Mountain       12:00      Wed, Mar 27    
+#> 5 US/Central        13:00      Wed, Mar 27    
+#> 6 US/Eastern        14:00      Wed, Mar 27
 ```
 
 # More charming display…
+
+You can of course display in a nicer way, passing to html table maker
+for example.
 
 ``` r
 date_time_tz_to_tzs() |> 
   local_tzs_df_collapse() |> 
   knitr::kable()
-#> `summarise()` has grouped output by 'local_time', 'local_date'. You can
-#> override using the `.groups` argument.
+#> `summarise()` has grouped output by 'local_time'. You can override using the
+#> `.groups` argument.
 ```
 
-| locations                           | local\_time | local\_date | local\_wday |
-| :---------------------------------- | :---------- | :---------- | :---------- |
-| Adelaide                            | 04:30:00    | 2024-03-28  | Thu         |
-| Melbourne; Sydney                   | 05:00:00    | 2024-03-28  | Thu         |
-| US/Pacific                          | 11:00:00    | 2024-03-27  | Wed         |
-| US/Mountain                         | 12:00:00    | 2024-03-27  | Wed         |
-| US/Central                          | 13:00:00    | 2024-03-27  | Wed         |
-| US/Eastern                          | 14:00:00    | 2024-03-27  | Wed         |
-| Buenos\_Aires; Santiago; Sao\_Paulo | 15:00:00    | 2024-03-27  | Wed         |
-| London                              | 18:00:00    | 2024-03-27  | Wed         |
-| Amsterdam; Paris; Stockholm; Vienna | 19:00:00    | 2024-03-27  | Wed         |
+| locations                           | local\_time | local\_wday\_date |
+| :---------------------------------- | :---------- | :---------------- |
+| Adelaide                            | 04:30:00    | Thu, Mar 28       |
+| Melbourne; Sydney                   | 05:00:00    | Thu, Mar 28       |
+| US/Pacific                          | 11:00:00    | Wed, Mar 27       |
+| US/Mountain                         | 12:00:00    | Wed, Mar 27       |
+| US/Central                          | 13:00:00    | Wed, Mar 27       |
+| US/Eastern                          | 14:00:00    | Wed, Mar 27       |
+| Buenos\_Aires; Santiago; Sao\_Paulo | 15:00:00    | Wed, Mar 27       |
+| London                              | 18:00:00    | Wed, Mar 27       |
+| Amsterdam; Paris; Stockholm; Vienna | 19:00:00    | Wed, Mar 27       |
 
-# Inspiration - global clocks\!
+### Let’s build a wall of global clocks with base ggplot2
 
 ``` r
 date_time_tz_to_tzs() |> 
@@ -171,13 +257,278 @@ date_time_tz_to_tzs() |>
             show.legend = F) + 
   theme_void() + 
   annotate(geom = "segment", x = 0, xend = 1, y = 1.2, yend = 1.2)
-#> `summarise()` has grouped output by 'local_time', 'local_date'. You can
-#> override using the `.groups` argument.
+#> `summarise()` has grouped output by 'local_time'. You can override using the
+#> `.groups` argument.
 ```
 
-<img src="man/figures/README-unnamed-chunk-5-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
 
-## Practical more practical… (could be wrapped up in a function … or app)
+## Speed things up by putting some of this into functions
+
+### `gglobalclocks()`
+
+``` r
+gglobalclocks <- function(data = NULL){
+  
+  ggplot2::ggplot(data) + 
+  list(ggplot2::theme_void(),
+       ggplot2::coord_polar(),
+       ggplot2::scale_x_continuous(limits = c(0,1)),
+       ggplot2::scale_y_continuous(limits = c(0,1.3)))
+  
+}
+```
+
+### `stamp_clockface()`
+
+``` r
+stamp_clockface <- function(){
+  
+    list(ggplot2::geom_text(data = data.frame(x = 1:12, y = 1), 
+            ggplot2::aes(label = x, x = x/12, y = y, xend = NULL, 
+                yend = NULL, color = NULL, local_time = NULL),
+            show.legend = F),
+          ggplot2::annotate(geom = "segment", x = 0, xend = 1, y = 1.2, yend = 1.2)
+         
+    )
+  
+}
+```
+
+``` r
+gglobalclocks() + stamp_clockface()
+```
+
+<img src="man/figures/README-unnamed-chunk-8-1.png" width="100%" />
+
+### `statClockhourhand`
+
+``` r
+# there's probably a lot of fun to be had refactoring this!
+# seems quite verbose
+compute_clock_hands <- function(data){
+  
+  data |> 
+  dplyr::mutate(minute_turn = local_time %>% lubridate::minute() %% 60 / 60) |> 
+  dplyr::mutate(hour_turn = local_time %>% lubridate::hour() %% 12/12 + minute_turn/12) |>  
+  dplyr::mutate(am_pm = ifelse(local_time %>% lubridate::hour() > 12, "pm", "am")) 
+  
+}
+
+compute_hour_hand <- function(data, scales){
+  
+  data |>
+    compute_clock_hands() |>
+    dplyr::mutate(x =  hour_turn, 
+      xend =  hour_turn,
+      y = 0,
+      yend = .6)
+  
+}
+
+compute_minute_hand <- function(data, scales){
+  
+  data |>
+    compute_clock_hands() |>
+    dplyr::mutate(x =  minute_turn, 
+      xend =  minute_turn,
+      # color = am_pm, 
+      y = 0,
+      yend = 1)
+  
+}
+
+
+statClockminhand <- ggplot2::ggproto(`_class` = "statClockminhand",
+                          `_inherit` = ggplot2::Stat,
+                          # required_aes = c("local_time"),
+                          compute_group = compute_minute_hand,
+                          default_aes = ggplot2::aes(color =
+                                                            ggplot2::after_stat(am_pm))
+                           )
+
+geom_minute_hand <- function(
+  mapping = NULL,
+  data = NULL,
+  position = "identity",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE, ...) {
+  ggplot2::layer(
+    stat = statClockminhand,  # proto object from step 2
+    geom = ggplot2::GeomSegment,  # inherit other behavior
+    data = data,
+    mapping = mapping,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(na.rm = na.rm, ...)
+  )
+}
+
+statClockhourhand <- ggplot2::ggproto(`_class` = "statClockhourhand",
+                          `_inherit` = ggplot2::Stat,
+                          # required_aes = c("local_time"),
+                          compute_group = compute_hour_hand,
+                          default_aes = ggplot2::aes(color =
+                                                            ggplot2::after_stat(am_pm))
+                           )
+```
+
+``` r
+date_time_tz_to_tzs() |> compute_clock_hands()
+#> # A tibble: 15 × 9
+#>    tz       local_time_date_utc local_time local_date local_wday local_wday_date
+#>    <chr>    <dttm>              <time>     <date>     <ord>      <chr>          
+#>  1 US/Paci… 2024-03-27 11:00:00 11:00      2024-03-27 Wed        Wed, Mar 27    
+#>  2 US/Moun… 2024-03-27 12:00:00 12:00      2024-03-27 Wed        Wed, Mar 27    
+#>  3 US/Cent… 2024-03-27 13:00:00 13:00      2024-03-27 Wed        Wed, Mar 27    
+#>  4 US/East… 2024-03-27 14:00:00 14:00      2024-03-27 Wed        Wed, Mar 27    
+#>  5 America… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27    
+#>  6 America… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27    
+#>  7 America… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27    
+#>  8 Europe/… 2024-03-27 18:00:00 18:00      2024-03-27 Wed        Wed, Mar 27    
+#>  9 Europe/… 2024-03-27 19:00:00 19:00      2024-03-27 Wed        Wed, Mar 27    
+#> 10 Europe/… 2024-03-27 19:00:00 19:00      2024-03-27 Wed        Wed, Mar 27    
+#> 11 Europe/… 2024-03-27 19:00:00 19:00      2024-03-27 Wed        Wed, Mar 27    
+#> 12 Europe/… 2024-03-27 19:00:00 19:00      2024-03-27 Wed        Wed, Mar 27    
+#> 13 Austral… 2024-03-28 04:30:00 04:30      2024-03-28 Thu        Thu, Mar 28    
+#> 14 Austral… 2024-03-28 05:00:00 05:00      2024-03-28 Thu        Thu, Mar 28    
+#> 15 Austral… 2024-03-28 05:00:00 05:00      2024-03-28 Thu        Thu, Mar 28    
+#> # ℹ 3 more variables: minute_turn <dbl>, hour_turn <dbl>, am_pm <chr>
+date_time_tz_to_tzs() |> compute_minute_hand()
+#> # A tibble: 15 × 13
+#>    tz       local_time_date_utc local_time local_date local_wday local_wday_date
+#>    <chr>    <dttm>              <time>     <date>     <ord>      <chr>          
+#>  1 US/Paci… 2024-03-27 11:00:00 11:00      2024-03-27 Wed        Wed, Mar 27    
+#>  2 US/Moun… 2024-03-27 12:00:00 12:00      2024-03-27 Wed        Wed, Mar 27    
+#>  3 US/Cent… 2024-03-27 13:00:00 13:00      2024-03-27 Wed        Wed, Mar 27    
+#>  4 US/East… 2024-03-27 14:00:00 14:00      2024-03-27 Wed        Wed, Mar 27    
+#>  5 America… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27    
+#>  6 America… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27    
+#>  7 America… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27    
+#>  8 Europe/… 2024-03-27 18:00:00 18:00      2024-03-27 Wed        Wed, Mar 27    
+#>  9 Europe/… 2024-03-27 19:00:00 19:00      2024-03-27 Wed        Wed, Mar 27    
+#> 10 Europe/… 2024-03-27 19:00:00 19:00      2024-03-27 Wed        Wed, Mar 27    
+#> 11 Europe/… 2024-03-27 19:00:00 19:00      2024-03-27 Wed        Wed, Mar 27    
+#> 12 Europe/… 2024-03-27 19:00:00 19:00      2024-03-27 Wed        Wed, Mar 27    
+#> 13 Austral… 2024-03-28 04:30:00 04:30      2024-03-28 Thu        Thu, Mar 28    
+#> 14 Austral… 2024-03-28 05:00:00 05:00      2024-03-28 Thu        Thu, Mar 28    
+#> 15 Austral… 2024-03-28 05:00:00 05:00      2024-03-28 Thu        Thu, Mar 28    
+#> # ℹ 7 more variables: minute_turn <dbl>, hour_turn <dbl>, am_pm <chr>, x <dbl>,
+#> #   xend <dbl>, y <dbl>, yend <dbl>
+```
+
+### `geom_clock_hands()`
+
+``` r
+geom_hour_hand <- function(
+  mapping = NULL,
+  data = NULL,
+  position = "identity",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE, ...) {
+  ggplot2::layer(
+    stat = statClockhourhand,  # proto object from step 2
+    geom = ggplot2::GeomSegment,  # inherit other behavior
+    data = data,
+    mapping = mapping,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(na.rm = na.rm, ...)
+  )
+}
+
+
+geom_clock_hands <- function(...){
+  
+  list(geom_hour_hand(...),
+       geom_minute_hand(...))
+  
+}
+```
+
+### Try it out
+
+``` r
+date_time_tz_to_tzs() |>
+  local_tzs_df_collapse() |>
+gglobalclocks() +
+  aes(local_time = local_time) +
+  stamp_clockface() +
+  geom_minute_hand() +
+  geom_hour_hand() +
+  facet_wrap(~locations)
+#> `summarise()` has grouped output by 'local_time'. You can override using the
+#> `.groups` argument.
+```
+
+<img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
+
+``` r
+
+
+date_time_tz_to_tzs() |> 
+  local_tzs_df_collapse() |>
+  gglobalclocks() + 
+  aes(local_time = local_time) + 
+  stamp_clockface() + 
+  geom_clock_hands() + 
+  facet_wrap(~locations)
+#> `summarise()` has grouped output by 'local_time'. You can override using the
+#> `.groups` argument.
+```
+
+<img src="man/figures/README-unnamed-chunk-10-2.png" width="100%" />
+
+``` r
+readme2pkg::chunk_to_r("gglobalclocks")
+readme2pkg::chunk_to_r("stamp_clockface")
+
+readme2pkg::chunk_to_r("statClockhourhand")
+readme2pkg::chunk_to_r("geom_clock_hands")
+```
+
+## If a wall of clocks is unhelpful in scheduling, can we viz in a different way? Towards LocationXLocaTime plot
+
+### `stamp_workday()`
+
+We’ll use an ‘stamp’ (annotation) layer that helps us get oriented to
+the 12 hours in a work day.
+
+``` r
+create_day_schedule_df <- function(){
+  
+  data.frame(time_start = 
+                                hms::as_hms(c("00:00:00","07:00:00", "09:00:00", "17:00:00","21:00:00")), 
+                              time_end = 
+                                hms::as_hms(c("07:00:00","09:00:00", "17:00:00", "21:00:00","24:00:00")),
+                              stance = c("avoid","awake", "business","awake","avoid"))
+}
+
+
+stamp_workday <- function(show.legend = T){  
+  
+  ggplot2::geom_rect(data = create_day_schedule_df(),
+            ggplot2::aes(xmin = time_start,
+                xmax = time_end, 
+                x = NULL,
+                fill = stance,
+                ymin = -Inf,
+                ymax = Inf,
+                y = NULL,
+                color = NULL),
+           alpha = .5, show.legend = show.legend) 
+}
+```
+
+``` r
+readme2pkg::chunk_to_r(chunk_name = "stamp_workday")
+```
+
+## LocationXLocalTime
 
 ``` r
 date_time_tz_to_tzs() |> 
@@ -185,58 +536,24 @@ date_time_tz_to_tzs() |>
   ggplot() + 
   aes(local_time, fct_inorder(str_wrap(locations,25))) + 
   labs(x = "Local meet time", y = NULL) + 
+  stamp_workday() +
   geom_point() + 
-  annotate(geom = "rect",
-            xmin = hms::as_hms("09:00:00"),
-            xmax = hms::as_hms("17:00:00"),
-            ymin = -Inf,
-            ymax = Inf,
-           alpha = .2, 
-           fill = "darkolivegreen3") + 
-    geom_vline(xintercept = hms::as_hms("12:00:00"),
-              linetype = "dashed", color = "grey25",
-              alpha = .2) +
-    annotate(geom = "rect",
-            xmin = hms::as_hms("07:00:00"),
-            xmax = hms::as_hms("09:00:00"),
-            ymin = -Inf,
-            ymax = Inf,
-           alpha = .2, 
-           fill = "goldenrod2") + 
-      annotate(geom = "rect",
-            xmin = hms::as_hms("17:00:00"),
-            xmax = hms::as_hms("21:00:00"),
-            ymin = -Inf,
-            ymax = Inf,
-           alpha = .2, 
-           fill = "goldenrod2") + 
-      annotate(geom = "rect",
-            xmin = hms::as_hms("00:00:00"),
-            xmax = hms::as_hms("07:00:00"),
-            ymin = -Inf,
-            ymax = Inf,
-           alpha = .2, 
-           fill = "black") + 
-        annotate(geom = "rect",
-            xmin = hms::as_hms("21:00:00"),
-            xmax = hms::as_hms("23:00:00"),
-            ymin = -Inf,
-            ymax = Inf,
-           alpha = .2, 
-           fill = "black") + 
   geom_text(aes(label = local_time),
             hjust = -.1, show.legend = F) + 
-  aes(color = paste0(local_wday, " ", month(local_date, label = T), ", ", day(local_date))) +
+  geom_vline(xintercept = hms::as_hms("12:00:00"),
+              linetype = "dashed", color = "grey25",
+              alpha = .2) +
+  aes(color = local_wday_date) +
   labs(color = "Local meet date") +
   theme(legend.position = "top", 
         legend.justification = "left") + 
   theme(panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_line(color = ""))
-#> `summarise()` has grouped output by 'local_time', 'local_date'. You can
-#> override using the `.groups` argument.
+#> `summarise()` has grouped output by 'local_time'. You can override using the
+#> `.groups` argument.
 ```
 
-<img src="man/figures/README-unnamed-chunk-6-1.png" width="100%" />
+<img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />
 
 # Part II. Packaging and documentation 🚧
 
@@ -428,213 +745,3 @@ devtools::check(pkg = ".")
 
 What would gglobalclocks syntax look like using above approach as
 jumping off point?
-
-    gglobalclocks() + # wraps up theme void and coord_polar 
-     stamp_clockface() + # wraps up drawing numbers and circle
-     aes(local_date_time = date_timevar) + 
-     geom_clockhands() + 
-     facet_wrap(~location)
-
-# returning to the actual global clocks idea.
-
-``` r
-gglobalclocks <- function(data = NULL){
-  
-  ggplot(data) + 
-  list(theme_void(),
-       coord_polar(),
-       scale_x_continuous(limits = c(0,1)),
-       scale_y_continuous(limits = c(0,1.3)))
-  
-}
-
-gglobalclocks()
-```
-
-<img src="man/figures/README-unnamed-chunk-20-1.png" width="100%" />
-
-``` r
-
-stamp_clockface <- function(){
-  
-    list(geom_text(data = tibble(x = 1:12, y = 1), 
-            aes(label = x, x = x/12, y = y, xend = NULL, 
-                yend = NULL, color = NULL, local_time = NULL),
-            show.legend = F),
-          annotate(geom = "segment", x = 0, xend = 1, y = 1.2, yend = 1.2)
-         
-    )
-  
-}
-
-gglobalclocks() + stamp_clockface()
-```
-
-<img src="man/figures/README-unnamed-chunk-20-2.png" width="100%" />
-
-``` r
-
-compute_clock_hands <- function(data){
-  
-  data |> 
-  dplyr::mutate(minute_turn = local_time %>% lubridate::minute() %% 60 / 60) |> 
-  dplyr::mutate(hour_turn = local_time %>% lubridate::hour() %% 12/12 + minute_turn/12) |>  
-  dplyr::mutate(am_pm = ifelse(local_time %>% lubridate::hour() > 12, "pm", "am")) 
-  
-}
-
-compute_hour_hand <- function(data, scales){
-  
-  data |>
-    compute_clock_hands() |>
-    dplyr::mutate(x =  hour_turn, 
-      xend =  hour_turn,
-      y = 0,
-      yend = .6)
-  
-}
-
-compute_minute_hand <- function(data, scales){
-  
-  data |>
-    compute_clock_hands() |>
-    dplyr::mutate(x =  minute_turn, 
-      xend =  minute_turn,
-      # color = am_pm, 
-      y = 0,
-      yend = 1)
-  
-}
-
-date_time_tz_to_tzs() |> compute_clock_hands()
-#> # A tibble: 15 × 8
-#>    tz           local_time_date_utc local_time local_date local_wday minute_turn
-#>    <chr>        <dttm>              <time>     <date>     <ord>            <dbl>
-#>  1 US/Pacific   2024-03-27 11:00:00 11:00      2024-03-27 Wed                0  
-#>  2 US/Mountain  2024-03-27 12:00:00 12:00      2024-03-27 Wed                0  
-#>  3 US/Central   2024-03-27 13:00:00 13:00      2024-03-27 Wed                0  
-#>  4 US/Eastern   2024-03-27 14:00:00 14:00      2024-03-27 Wed                0  
-#>  5 America/Bue… 2024-03-27 15:00:00 15:00      2024-03-27 Wed                0  
-#>  6 America/San… 2024-03-27 15:00:00 15:00      2024-03-27 Wed                0  
-#>  7 America/Sao… 2024-03-27 15:00:00 15:00      2024-03-27 Wed                0  
-#>  8 Europe/Lond… 2024-03-27 18:00:00 18:00      2024-03-27 Wed                0  
-#>  9 Europe/Amst… 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  
-#> 10 Europe/Paris 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  
-#> 11 Europe/Stoc… 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  
-#> 12 Europe/Vien… 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  
-#> 13 Australia/A… 2024-03-28 04:30:00 04:30      2024-03-28 Thu                0.5
-#> 14 Australia/M… 2024-03-28 05:00:00 05:00      2024-03-28 Thu                0  
-#> 15 Australia/S… 2024-03-28 05:00:00 05:00      2024-03-28 Thu                0  
-#> # ℹ 2 more variables: hour_turn <dbl>, am_pm <chr>
-date_time_tz_to_tzs() |> compute_minute_hand()
-#> # A tibble: 15 × 12
-#>    tz           local_time_date_utc local_time local_date local_wday minute_turn
-#>    <chr>        <dttm>              <time>     <date>     <ord>            <dbl>
-#>  1 US/Pacific   2024-03-27 11:00:00 11:00      2024-03-27 Wed                0  
-#>  2 US/Mountain  2024-03-27 12:00:00 12:00      2024-03-27 Wed                0  
-#>  3 US/Central   2024-03-27 13:00:00 13:00      2024-03-27 Wed                0  
-#>  4 US/Eastern   2024-03-27 14:00:00 14:00      2024-03-27 Wed                0  
-#>  5 America/Bue… 2024-03-27 15:00:00 15:00      2024-03-27 Wed                0  
-#>  6 America/San… 2024-03-27 15:00:00 15:00      2024-03-27 Wed                0  
-#>  7 America/Sao… 2024-03-27 15:00:00 15:00      2024-03-27 Wed                0  
-#>  8 Europe/Lond… 2024-03-27 18:00:00 18:00      2024-03-27 Wed                0  
-#>  9 Europe/Amst… 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  
-#> 10 Europe/Paris 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  
-#> 11 Europe/Stoc… 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  
-#> 12 Europe/Vien… 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  
-#> 13 Australia/A… 2024-03-28 04:30:00 04:30      2024-03-28 Thu                0.5
-#> 14 Australia/M… 2024-03-28 05:00:00 05:00      2024-03-28 Thu                0  
-#> 15 Australia/S… 2024-03-28 05:00:00 05:00      2024-03-28 Thu                0  
-#> # ℹ 6 more variables: hour_turn <dbl>, am_pm <chr>, x <dbl>, xend <dbl>,
-#> #   y <dbl>, yend <dbl>
-
-
-statClockminhand <- ggproto(`_class` = "statClockminhand",
-                          `_inherit` = ggplot2::Stat,
-                          # required_aes = c("local_time"),
-                          compute_group = compute_minute_hand,
-                          default_aes = ggplot2::aes(color =
-                                                            ggplot2::after_stat(am_pm))
-                           )
-
-geom_minute_hand <- function(
-  mapping = NULL,
-  data = NULL,
-  position = "identity",
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE, ...) {
-  ggplot2::layer(
-    stat = statClockminhand,  # proto object from step 2
-    geom = ggplot2::GeomSegment,  # inherit other behavior
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, ...)
-  )
-}
-
-statClockhourhand <- ggproto(`_class` = "statClockhourhand",
-                          `_inherit` = ggplot2::Stat,
-                          # required_aes = c("local_time"),
-                          compute_group = compute_hour_hand,
-                          default_aes = ggplot2::aes(color =
-                                                            ggplot2::after_stat(am_pm))
-                           )
-
-geom_hour_hand <- function(
-  mapping = NULL,
-  data = NULL,
-  position = "identity",
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE, ...) {
-  ggplot2::layer(
-    stat = statClockhourhand,  # proto object from step 2
-    geom = ggplot2::GeomSegment,  # inherit other behavior
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, ...)
-  )
-}
-
-date_time_tz_to_tzs() |>
-  local_tzs_df_collapse() |>
-gglobalclocks() +
-  aes(local_time = local_time) +
-  stamp_clockface() +
-  geom_minute_hand() +
-  geom_hour_hand() +
-  facet_wrap(~locations)
-#> `summarise()` has grouped output by 'local_time', 'local_date'. You can
-#> override using the `.groups` argument.
-```
-
-<img src="man/figures/README-unnamed-chunk-20-3.png" width="100%" />
-
-``` r
-
-geom_clock_hands <- function(...){
-  
-  list(geom_hour_hand(...),
-       geom_minute_hand(...))
-  
-}
-
-date_time_tz_to_tzs() |> 
-  local_tzs_df_collapse() |>
-  gglobalclocks() + 
-  aes(local_time = local_time) + 
-  stamp_clockface() + 
-  geom_clock_hands() + 
-  facet_wrap(~locations)
-#> `summarise()` has grouped output by 'local_time', 'local_date'. You can
-#> override using the `.groups` argument.
-```
-
-<img src="man/figures/README-unnamed-chunk-20-4.png" width="100%" />

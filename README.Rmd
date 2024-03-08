@@ -15,9 +15,47 @@ knitr::opts_chunk$set(
   fig.path = "man/figures/README-",
   out.width = "100%"
 )
+options(tidyverse.quiet = TRUE)
 ```
 
 # gglobalclocks
+
+What if you could draw a beautiful 'wall' of clocks with local times from around the world?  Well, gglobalclocks lets you do that!
+
+I worked on the wall of clocks thinking it might help me schedule virtual meetings with participant from around the world.  Does a beautiful wall of clocks help schedule global meetings?  As it turns out, in my experience, not really!
+
+But gglobalclocks also has utilities for building dataframes of locations and local times which I have found helpful for multi-timezone scheduling.
+
+
+```{r, eval = T}
+library(tidyverse)
+gglobalclocks:::date_time_tz_to_tzs() |> 
+  gglobalclocks:::local_tzs_df_collapse() |>
+  gglobalclocks:::gglobalclocks() + 
+    aes(local_time = local_time) + 
+    gglobalclocks:::stamp_clockface() + 
+    gglobalclocks:::geom_clock_hands() + 
+    facet_wrap(~str_wrap(locations, 20))
+  
+gglobalclocks:::date_time_tz_to_tzs() |> 
+  head()
+
+gglobalclocks:::date_time_tz_to_tzs() |> 
+  gglobalclocks:::local_tzs_df_collapse()
+
+gglobalclocks:::date_time_tz_to_tzs(
+  from_date_time = "2024-03-06 12:00:00",
+  from_tz = "US/Mountain",
+  to_tz = c("US/Mountain", "Europe/Paris", "America/Sao_Paulo")
+  ) |> 
+  gglobalclocks:::local_tzs_df_collapse() |>  
+  ggplot() + 
+  gglobalclocks:::stamp_workday() +
+  aes(local_time, locations) + 
+  geom_point() +
+  geom_text(aes(label = local_time)) + 
+  aes(color = local_wday_date)
+```
 
 
 ```{r, comment=""}
@@ -25,7 +63,13 @@ library(tidyverse)
 library(lubridate)
 ```
 
+---
+
+## Part II. Functions discussion and definitions
+
 ### `time_to_local()`
+
+One helper function to do translation from one time zone to multiple time zones is time_to_local.  From working on global clocks, it seems like you can't keep date-times with different time zones in one vector (or variable), so you need to do a conversion one by one and save a character version of the complete time zone information.
 
 ```{r time_to_local}
 time_to_local <- function(x, tz){
@@ -35,6 +79,8 @@ time_to_local <- function(x, tz){
 ```
 
 ### `date_time_tz_to_tzs()`
+
+We can use the converter above to translate from a 'from' location and time to a bunch of locations' local times. We do this and then add a few more helpful columns like local_time, local_date etc.  
 
 ```{r date_time_tz_to_tzs}
 date_time_tz_to_tzs <- function(from_date_time = "2024-03-27 12:00:00", 
@@ -71,20 +117,27 @@ OlsonNames() %>%
   dplyr::mutate(local_date = as.Date(local_date_time_chr)) %>%
   dplyr::mutate(local_wday = lubridate::wday(local_date, label = T)) %>%
   dplyr::arrange(local_date, local_time) %>%
-  dplyr::select(-local_date_time_chr)
+  dplyr::select(-local_date_time_chr) %>%
+  dplyr::mutate(local_wday_date = paste0(local_wday, ", ", month(local_date, label = T), " ", day(local_date)))
 
 }
 ```
 
 
+```{r}
+date_time_tz_to_tzs() |>
+  head()
+```
 
 ### `local_tzs_df_collapse()`
+
+If it turns out that you have multiple tz with the same local meeting time, you can collapse these locations by local time.  
 
 ```{r local_tzs_df_collapse}
 local_tzs_df_collapse <- function(local_tzs_df, collapse = "; "){
   
   local_tzs_df |>
-    group_by(local_time, local_date, local_wday) |>
+    group_by(local_time, local_wday_date) |>
     summarise(locations = paste(tz, collapse = collapse)) |>
     ungroup() |>
     select(locations, everything()) |>
@@ -93,12 +146,9 @@ local_tzs_df_collapse <- function(local_tzs_df, collapse = "; "){
 }
 ```
 
-
+This is the type of information you might send to an attendees list so they can know, at a glance, their likelihood of making attending work.
 
 ```{r}
-date_time_tz_to_tzs() |>
-  head()
-
 date_time_tz_to_tzs() |> 
   local_tzs_df_collapse() |> 
   head()
@@ -106,13 +156,16 @@ date_time_tz_to_tzs() |>
 
 # More charming display...
 
+You can of course display in a nicer way, passing to html table maker for example.
+
 ```{r}
 date_time_tz_to_tzs() |> 
   local_tzs_df_collapse() |> 
   knitr::kable()
 ```
 
-# Inspiration - global clocks! 
+
+### Let's build a wall of global clocks with base ggplot2
 
 ```{r}
 date_time_tz_to_tzs() |> 
@@ -144,8 +197,222 @@ date_time_tz_to_tzs() |>
   annotate(geom = "segment", x = 0, xend = 1, y = 1.2, yend = 1.2)
 ```
 
-## Practical more practical... (could be wrapped up in a function ... or app)
+## Speed things up by putting some of this into functions
 
+### `gglobalclocks()`
+
+```{r gglobalclocks, eval = T}
+gglobalclocks <- function(data = NULL){
+  
+  ggplot2::ggplot(data) + 
+  list(ggplot2::theme_void(),
+       ggplot2::coord_polar(),
+       ggplot2::scale_x_continuous(limits = c(0,1)),
+       ggplot2::scale_y_continuous(limits = c(0,1.3)))
+  
+}
+```
+
+### `stamp_clockface()`
+
+
+```{r stamp_clockface}
+stamp_clockface <- function(){
+  
+    list(ggplot2::geom_text(data = data.frame(x = 1:12, y = 1), 
+            ggplot2::aes(label = x, x = x/12, y = y, xend = NULL, 
+                yend = NULL, color = NULL, local_time = NULL),
+            show.legend = F),
+          ggplot2::annotate(geom = "segment", x = 0, xend = 1, y = 1.2, yend = 1.2)
+         
+    )
+  
+}
+```
+
+```{r}
+gglobalclocks() + stamp_clockface()
+```
+
+### `statClockhourhand`
+
+
+```{r statClockhourhand}
+# there's probably a lot of fun to be had refactoring this!
+# seems quite verbose
+compute_clock_hands <- function(data){
+  
+  data |> 
+  dplyr::mutate(minute_turn = local_time %>% lubridate::minute() %% 60 / 60) |> 
+  dplyr::mutate(hour_turn = local_time %>% lubridate::hour() %% 12/12 + minute_turn/12) |>  
+  dplyr::mutate(am_pm = ifelse(local_time %>% lubridate::hour() > 12, "pm", "am")) 
+  
+}
+
+compute_hour_hand <- function(data, scales){
+  
+  data |>
+    compute_clock_hands() |>
+    dplyr::mutate(x =  hour_turn, 
+      xend =  hour_turn,
+      y = 0,
+      yend = .6)
+  
+}
+
+compute_minute_hand <- function(data, scales){
+  
+  data |>
+    compute_clock_hands() |>
+    dplyr::mutate(x =  minute_turn, 
+      xend =  minute_turn,
+      # color = am_pm, 
+      y = 0,
+      yend = 1)
+  
+}
+
+
+statClockminhand <- ggplot2::ggproto(`_class` = "statClockminhand",
+                          `_inherit` = ggplot2::Stat,
+                          # required_aes = c("local_time"),
+                          compute_group = compute_minute_hand,
+                          default_aes = ggplot2::aes(color =
+                                                            ggplot2::after_stat(am_pm))
+                           )
+
+geom_minute_hand <- function(
+  mapping = NULL,
+  data = NULL,
+  position = "identity",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE, ...) {
+  ggplot2::layer(
+    stat = statClockminhand,  # proto object from step 2
+    geom = ggplot2::GeomSegment,  # inherit other behavior
+    data = data,
+    mapping = mapping,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(na.rm = na.rm, ...)
+  )
+}
+
+statClockhourhand <- ggplot2::ggproto(`_class` = "statClockhourhand",
+                          `_inherit` = ggplot2::Stat,
+                          # required_aes = c("local_time"),
+                          compute_group = compute_hour_hand,
+                          default_aes = ggplot2::aes(color =
+                                                            ggplot2::after_stat(am_pm))
+                           )
+```
+
+```{r}
+date_time_tz_to_tzs() |> compute_clock_hands()
+date_time_tz_to_tzs() |> compute_minute_hand()
+```
+
+### `geom_clock_hands()`
+
+```{r geom_clock_hands}
+geom_hour_hand <- function(
+  mapping = NULL,
+  data = NULL,
+  position = "identity",
+  na.rm = FALSE,
+  show.legend = NA,
+  inherit.aes = TRUE, ...) {
+  ggplot2::layer(
+    stat = statClockhourhand,  # proto object from step 2
+    geom = ggplot2::GeomSegment,  # inherit other behavior
+    data = data,
+    mapping = mapping,
+    position = position,
+    show.legend = show.legend,
+    inherit.aes = inherit.aes,
+    params = list(na.rm = na.rm, ...)
+  )
+}
+
+
+geom_clock_hands <- function(...){
+  
+  list(geom_hour_hand(...),
+       geom_minute_hand(...))
+  
+}
+```
+
+### Try it out
+
+```{r}
+date_time_tz_to_tzs() |>
+  local_tzs_df_collapse() |>
+gglobalclocks() +
+  aes(local_time = local_time) +
+  stamp_clockface() +
+  geom_minute_hand() +
+  geom_hour_hand() +
+  facet_wrap(~locations)
+
+
+date_time_tz_to_tzs() |> 
+  local_tzs_df_collapse() |>
+  gglobalclocks() + 
+  aes(local_time = local_time) + 
+  stamp_clockface() + 
+  geom_clock_hands() + 
+  facet_wrap(~locations)
+```
+
+```{r}
+readme2pkg::chunk_to_r("gglobalclocks")
+readme2pkg::chunk_to_r("stamp_clockface")
+
+readme2pkg::chunk_to_r("statClockhourhand")
+readme2pkg::chunk_to_r("geom_clock_hands")
+```
+
+
+## If a wall of clocks is unhelpful in scheduling, can we viz in a different way? Towards LocationXLocaTime plot
+
+### `stamp_workday()`
+
+We'll use an 'stamp' (annotation) layer that helps us get oriented to the 12 hours in a work day.
+
+```{r stamp_workday}
+create_day_schedule_df <- function(){
+  
+  data.frame(time_start = 
+                                hms::as_hms(c("00:00:00","07:00:00", "09:00:00", "17:00:00","21:00:00")), 
+                              time_end = 
+                                hms::as_hms(c("07:00:00","09:00:00", "17:00:00", "21:00:00","24:00:00")),
+                              stance = c("avoid","awake", "business","awake","avoid"))
+}
+
+
+stamp_workday <- function(show.legend = T){  
+  
+  ggplot2::geom_rect(data = create_day_schedule_df(),
+            ggplot2::aes(xmin = time_start,
+                xmax = time_end, 
+                x = NULL,
+                fill = stance,
+                ymin = -Inf,
+                ymax = Inf,
+                y = NULL,
+                color = NULL),
+           alpha = .5, show.legend = show.legend) 
+}
+```
+
+```{r}
+readme2pkg::chunk_to_r(chunk_name = "stamp_workday")
+```
+
+## LocationXLocalTime
 
 ```{r}
 date_time_tz_to_tzs() |> 
@@ -153,48 +420,14 @@ date_time_tz_to_tzs() |>
   ggplot() + 
   aes(local_time, fct_inorder(str_wrap(locations,25))) + 
   labs(x = "Local meet time", y = NULL) + 
+  stamp_workday() +
   geom_point() + 
-  annotate(geom = "rect",
-            xmin = hms::as_hms("09:00:00"),
-            xmax = hms::as_hms("17:00:00"),
-            ymin = -Inf,
-            ymax = Inf,
-           alpha = .2, 
-           fill = "darkolivegreen3") + 
-    geom_vline(xintercept = hms::as_hms("12:00:00"),
-              linetype = "dashed", color = "grey25",
-              alpha = .2) +
-    annotate(geom = "rect",
-            xmin = hms::as_hms("07:00:00"),
-            xmax = hms::as_hms("09:00:00"),
-            ymin = -Inf,
-            ymax = Inf,
-           alpha = .2, 
-           fill = "goldenrod2") + 
-      annotate(geom = "rect",
-            xmin = hms::as_hms("17:00:00"),
-            xmax = hms::as_hms("21:00:00"),
-            ymin = -Inf,
-            ymax = Inf,
-           alpha = .2, 
-           fill = "goldenrod2") + 
-      annotate(geom = "rect",
-            xmin = hms::as_hms("00:00:00"),
-            xmax = hms::as_hms("07:00:00"),
-            ymin = -Inf,
-            ymax = Inf,
-           alpha = .2, 
-           fill = "black") + 
-        annotate(geom = "rect",
-            xmin = hms::as_hms("21:00:00"),
-            xmax = hms::as_hms("23:00:00"),
-            ymin = -Inf,
-            ymax = Inf,
-           alpha = .2, 
-           fill = "black") + 
   geom_text(aes(label = local_time),
             hjust = -.1, show.legend = F) + 
-  aes(color = paste0(local_wday, " ", month(local_date, label = T), ", ", day(local_date))) +
+  geom_vline(xintercept = hms::as_hms("12:00:00"),
+              linetype = "dashed", color = "grey25",
+              alpha = .2) +
+  aes(color = local_wday_date) +
   labs(color = "Local meet date") +
   theme(legend.position = "top", 
         legend.justification = "left") + 
@@ -373,157 +606,4 @@ devtools::check(pkg = ".")
 What would gglobalclocks syntax look like using above approach as jumping off point?
 
 
-```
-gglobalclocks() + # wraps up theme void and coord_polar 
- stamp_clockface() + # wraps up drawing numbers and circle
- aes(local_date_time = date_timevar) + 
- geom_clockhands() + 
- facet_wrap(~location)
-```
- 
- 
-# returning to the actual global clocks idea.
 
-```{r eval = T}
-gglobalclocks <- function(data = NULL){
-  
-  ggplot(data) + 
-  list(theme_void(),
-       coord_polar(),
-       scale_x_continuous(limits = c(0,1)),
-       scale_y_continuous(limits = c(0,1.3)))
-  
-}
-
-gglobalclocks()
-
-stamp_clockface <- function(){
-  
-    list(geom_text(data = tibble(x = 1:12, y = 1), 
-            aes(label = x, x = x/12, y = y, xend = NULL, 
-                yend = NULL, color = NULL, local_time = NULL),
-            show.legend = F),
-          annotate(geom = "segment", x = 0, xend = 1, y = 1.2, yend = 1.2)
-         
-    )
-  
-}
-
-gglobalclocks() + stamp_clockface()
-
-compute_clock_hands <- function(data){
-  
-  data |> 
-  dplyr::mutate(minute_turn = local_time %>% lubridate::minute() %% 60 / 60) |> 
-  dplyr::mutate(hour_turn = local_time %>% lubridate::hour() %% 12/12 + minute_turn/12) |>  
-  dplyr::mutate(am_pm = ifelse(local_time %>% lubridate::hour() > 12, "pm", "am")) 
-  
-}
-
-compute_hour_hand <- function(data, scales){
-  
-  data |>
-    compute_clock_hands() |>
-    dplyr::mutate(x =  hour_turn, 
-      xend =  hour_turn,
-      y = 0,
-      yend = .6)
-  
-}
-
-compute_minute_hand <- function(data, scales){
-  
-  data |>
-    compute_clock_hands() |>
-    dplyr::mutate(x =  minute_turn, 
-      xend =  minute_turn,
-      # color = am_pm, 
-      y = 0,
-      yend = 1)
-  
-}
-
-date_time_tz_to_tzs() |> compute_clock_hands()
-date_time_tz_to_tzs() |> compute_minute_hand()
-
-
-statClockminhand <- ggproto(`_class` = "statClockminhand",
-                          `_inherit` = ggplot2::Stat,
-                          # required_aes = c("local_time"),
-                          compute_group = compute_minute_hand,
-                          default_aes = ggplot2::aes(color =
-                                                            ggplot2::after_stat(am_pm))
-                           )
-
-geom_minute_hand <- function(
-  mapping = NULL,
-  data = NULL,
-  position = "identity",
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE, ...) {
-  ggplot2::layer(
-    stat = statClockminhand,  # proto object from step 2
-    geom = ggplot2::GeomSegment,  # inherit other behavior
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, ...)
-  )
-}
-
-statClockhourhand <- ggproto(`_class` = "statClockhourhand",
-                          `_inherit` = ggplot2::Stat,
-                          # required_aes = c("local_time"),
-                          compute_group = compute_hour_hand,
-                          default_aes = ggplot2::aes(color =
-                                                            ggplot2::after_stat(am_pm))
-                           )
-
-geom_hour_hand <- function(
-  mapping = NULL,
-  data = NULL,
-  position = "identity",
-  na.rm = FALSE,
-  show.legend = NA,
-  inherit.aes = TRUE, ...) {
-  ggplot2::layer(
-    stat = statClockhourhand,  # proto object from step 2
-    geom = ggplot2::GeomSegment,  # inherit other behavior
-    data = data,
-    mapping = mapping,
-    position = position,
-    show.legend = show.legend,
-    inherit.aes = inherit.aes,
-    params = list(na.rm = na.rm, ...)
-  )
-}
-
-date_time_tz_to_tzs() |>
-  local_tzs_df_collapse() |>
-gglobalclocks() +
-  aes(local_time = local_time) +
-  stamp_clockface() +
-  geom_minute_hand() +
-  geom_hour_hand() +
-  facet_wrap(~locations)
-
-geom_clock_hands <- function(...){
-  
-  list(geom_hour_hand(...),
-       geom_minute_hand(...))
-  
-}
-
-date_time_tz_to_tzs() |> 
-  local_tzs_df_collapse() |>
-  gglobalclocks() + 
-  aes(local_time = local_time) + 
-  stamp_clockface() + 
-  geom_clock_hands() + 
-  facet_wrap(~locations)
-
-
-```
