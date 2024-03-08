@@ -60,25 +60,77 @@
 <div class="section level1">
 <div class="page-header"><h1 id="gglobalclocks">gglobalclocks<a class="anchor" aria-label="anchor" href="#gglobalclocks"></a>
 </h1></div>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1"></a><span class="kw">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2"></a>── Attaching core tidyverse packages ─────────────────── tidyverse <span class="dv">2</span>.<span class="dv">0</span>.<span class="fl">0.9000</span> ──</span>
-<span id="cb1-3"><a href="#cb1-3"></a>✔ dplyr     <span class="dv">1</span>.<span class="fl">1.0</span>          ✔ readr     <span class="dv">2</span>.<span class="fl">1.4</span>     </span>
-<span id="cb1-4"><a href="#cb1-4"></a>✔ forcats   <span class="dv">1</span>.<span class="fl">0.0</span>          ✔ stringr   <span class="dv">1</span>.<span class="fl">5.0</span>     </span>
-<span id="cb1-5"><a href="#cb1-5"></a>✔ ggplot2   <span class="dv">3</span>.<span class="dv">4</span>.<span class="fl">4.9000</span>     ✔ tibble    <span class="dv">3</span>.<span class="fl">2.1</span>     </span>
-<span id="cb1-6"><a href="#cb1-6"></a>✔ lubridate <span class="dv">1</span>.<span class="fl">9.2</span>          ✔ tidyr     <span class="dv">1</span>.<span class="fl">3.0</span>     </span>
-<span id="cb1-7"><a href="#cb1-7"></a>✔ purrr     <span class="dv">1</span>.<span class="fl">0.1</span>          </span>
-<span id="cb1-8"><a href="#cb1-8"></a>── Conflicts ────────────────────────────────────────── <span class="kw">tidyverse_conflicts</span>() ──</span>
-<span id="cb1-9"><a href="#cb1-9"></a>✖ dplyr<span class="op">::</span><span class="kw">filter</span>() masks stats<span class="op">::</span><span class="kw">filter</span>()</span>
-<span id="cb1-10"><a href="#cb1-10"></a>✖ dplyr<span class="op">::</span><span class="kw">lag</span>()    masks stats<span class="op">::</span><span class="kw">lag</span>()</span>
-<span id="cb1-11"><a href="#cb1-11"></a>ℹ Use the conflicted <span class="kw">package</span> (<span class="op">&lt;</span>http<span class="op">:</span><span class="er">//</span>conflicted.r<span class="op">-</span>lib.org<span class="op">/</span><span class="er">&gt;</span>) to force all conflicts to become errors</span>
-<span id="cb1-12"><a href="#cb1-12"></a><span class="kw">library</span>(lubridate)</span></code></pre></div>
+<p>What if you could draw a beautiful ‘wall’ of clocks with local times from around the world? Well, gglobalclocks lets you do that!</p>
+<p>I worked on the wall of clocks thinking it might help me schedule virtual meetings with participant from around the world. Does a beautiful wall of clocks help schedule global meetings? As it turns out, in my experience, not really!</p>
+<p>But gglobalclocks also has utilities for building dataframes of locations and local times which I have found helpful for multi-timezone scheduling.</p>
+<div class="sourceCode" id="cb1"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
+<span><span class="fu">gglobalclocks</span><span class="fu">:::</span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">gglobalclocks</span><span class="fu">:::</span><span class="fu">local_tzs_df_collapse</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">gglobalclocks</span><span class="fu">:::</span><span class="fu">gglobalclocks</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>local_time <span class="op">=</span> <span class="va">local_time</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>    <span class="fu">gglobalclocks</span><span class="fu">:::</span><span class="fu">stamp_clockface</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>    <span class="fu">gglobalclocks</span><span class="fu">:::</span><span class="fu">geom_clock_hands</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>    <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_wrap.html" class="external-link">str_wrap</a></span><span class="op">(</span><span class="va">locations</span>, <span class="fl">20</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-2-1.png" width="100%"></p>
+<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span>  </span>
+<span><span class="va">tz_targets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"US/Mountain"</span>,<span class="st">"US/Eastern"</span>,<span class="st">"US/Eastern"</span>, <span class="st">"Europe/Paris"</span>, <span class="st">"Europe/Amsterdam"</span>, <span class="st">"America/Sao_Paulo"</span>, <span class="st">"America/Santiago"</span>, <span class="st">"Australia/Melbourne"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">gglobalclocks</span><span class="fu">:::</span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span></span>
+<span>  from_date_time <span class="op">=</span> <span class="st">"2024-03-06 12:00:00"</span>,</span>
+<span>  from_tz <span class="op">=</span> <span class="st">"US/Mountain"</span>,</span>
+<span>  to_tz <span class="op">=</span> <span class="va">tz_targets</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 7 × 6</span></span>
+<span><span class="co">#&gt;   tz        local_time_date_utc local_time local_date local_wday local_wday_date</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;     &lt;dttm&gt;              &lt;time&gt;     &lt;date&gt;     &lt;ord&gt;      &lt;chr&gt;          </span></span>
+<span><span class="co">#&gt; 1 US/Mount… 2024-03-06 12:00:00 12:00      2024-03-06 Wed        Wed, Mar 6     </span></span>
+<span><span class="co">#&gt; 2 US/Easte… 2024-03-06 14:00:00 14:00      2024-03-06 Wed        Wed, Mar 6     </span></span>
+<span><span class="co">#&gt; 3 America/… 2024-03-06 16:00:00 16:00      2024-03-06 Wed        Wed, Mar 6     </span></span>
+<span><span class="co">#&gt; 4 America/… 2024-03-06 16:00:00 16:00      2024-03-06 Wed        Wed, Mar 6     </span></span>
+<span><span class="co">#&gt; 5 Europe/A… 2024-03-06 20:00:00 20:00      2024-03-06 Wed        Wed, Mar 6     </span></span>
+<span><span class="co">#&gt; 6 Europe/P… 2024-03-06 20:00:00 20:00      2024-03-06 Wed        Wed, Mar 6     </span></span>
+<span><span class="co">#&gt; 7 Australi… 2024-03-07 06:00:00 06:00      2024-03-07 Thu        Thu, Mar 7</span></span>
+<span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">gglobalclocks</span><span class="fu">:::</span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span></span>
+<span>  from_date_time <span class="op">=</span> <span class="st">"2024-03-06 12:00:00"</span>,</span>
+<span>  from_tz <span class="op">=</span> <span class="st">"US/Mountain"</span>,</span>
+<span>  to_tz <span class="op">=</span> <span class="va">tz_targets</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">gglobalclocks</span><span class="fu">:::</span><span class="fu">local_tzs_df_collapse</span><span class="op">(</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">df</span></span>
+<span><span class="co">#&gt; # A tibble: 5 × 4</span></span>
+<span><span class="co">#&gt;   locations           local_time local_wday_date location           </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;               &lt;time&gt;     &lt;chr&gt;           &lt;fct&gt;              </span></span>
+<span><span class="co">#&gt; 1 US/Mountain         12:00      Wed, Mar 6      US/Mountain        </span></span>
+<span><span class="co">#&gt; 2 US/Eastern          14:00      Wed, Mar 6      US/Eastern         </span></span>
+<span><span class="co">#&gt; 3 Santiago; Sao_Paulo 16:00      Wed, Mar 6      Santiago; Sao_Paulo</span></span>
+<span><span class="co">#&gt; 4 Amsterdam; Paris    20:00      Wed, Mar 6      Amsterdam; Paris   </span></span>
+<span><span class="co">#&gt; 5 Melbourne           06:00      Thu, Mar 7      Melbourne</span></span>
+<span></span>
+<span><span class="va">df</span> <span class="op">|&gt;</span>  </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">gglobalclocks</span><span class="fu">:::</span><span class="fu">stamp_workday</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">local_time</span>, <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_inorder.html" class="external-link">fct_inorder</a></span><span class="op">(</span><span class="va">locations</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="va">local_time</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">local_wday_date</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-2-2.png" width="100%"></p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://tidyverse.tidyverse.org" class="external-link">tidyverse</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://lubridate.tidyverse.org" class="external-link">lubridate</a></span><span class="op">)</span></span></code></pre></div>
+<hr>
+<div class="section level2">
+<h2 id="part-ii-functions-discussion-and-definitions">Part II. Functions discussion and definitions<a class="anchor" aria-label="anchor" href="#part-ii-functions-discussion-and-definitions"></a>
+</h2>
 <div class="section level3">
 <h3 id="time_to_local">
 <code>time_to_local()</code><a class="anchor" aria-label="anchor" href="#time_to_local"></a>
 </h3>
-<div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
+<p>One helper function to do translation from one time zone to multiple time zones is time_to_local. From working on global clocks, it seems like you can’t keep date-times with different time zones in one vector (or variable), so you need to do a conversion one by one and save a character version of the complete time zone information.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">time_to_local</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">x</span>, <span class="va">tz</span><span class="op">)</span><span class="op">{</span></span>
-<span>  <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/with_tz.html" class="external-link">with_tz</a></span><span class="op">(</span><span class="va">x</span>, tz <span class="op">=</span> <span class="va">tz</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span>  <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/with_tz.html" class="external-link">with_tz</a></span><span class="op">(</span><span class="va">x</span>, tz <span class="op">=</span> <span class="va">tz</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>    <span class="fu"><a href="https://rdrr.io/r/base/character.html" class="external-link">as.character</a></span><span class="op">(</span><span class="op">)</span></span>
 <span><span class="op">}</span></span></code></pre></div>
 </div>
@@ -86,7 +138,8 @@
 <h3 id="date_time_tz_to_tzs">
 <code>date_time_tz_to_tzs()</code><a class="anchor" aria-label="anchor" href="#date_time_tz_to_tzs"></a>
 </h3>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<p>We can use the converter above to translate from a ‘from’ location and time to a bunch of locations’ local times. We do this and then add a few more helpful columns like local_time, local_date etc.</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">date_time_tz_to_tzs</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">from_date_time</span> <span class="op">=</span> <span class="st">"2024-03-27 12:00:00"</span>, </span>
 <span>                                <span class="va">from_tz</span> <span class="op">=</span> <span class="st">"US/Mountain"</span>, </span>
 <span>                                <span class="va">to_tz</span> <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Europe/Paris"</span>, </span>
@@ -105,469 +158,242 @@
 <span>                                          <span class="st">"America/Santiago"</span>,</span>
 <span>                                          <span class="st">"America/Buenos_Aires"</span><span class="op">)</span><span class="op">)</span><span class="op">{</span></span>
 <span></span>
-<span>   <span class="va">meeting</span> <span class="op">&lt;-</span> <span class="fu">ymd_hms</span><span class="op">(</span><span class="va">from_date_time</span>, </span>
+<span>   <span class="va">meeting</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd_hms.html" class="external-link">ymd_hms</a></span><span class="op">(</span><span class="va">from_date_time</span>, </span>
 <span>                      tz <span class="op">=</span> <span class="va">from_tz</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/timezones.html" class="external-link">OlsonNames</a></span><span class="op">(</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>tz <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">tz</span> <span class="op">!=</span> <span class="st">"US/Pacific-New"</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">tz</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">to_tz</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>local_date_time_chr <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span><span class="va">meeting</span>, <span class="va">tz</span>, <span class="va">time_to_local</span><span class="op">)</span><span class="op">)</span>  <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span><span class="va">local_date_time_chr</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/timezones.html" class="external-link">OlsonNames</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>tz <span class="op">=</span> <span class="va">.</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">tz</span> <span class="op">!=</span> <span class="st">"US/Pacific-New"</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/filter.html" class="external-link">filter</a></span><span class="op">(</span><span class="va">tz</span> <span class="op"><a href="https://rdrr.io/r/base/match.html" class="external-link">%in%</a></span> <span class="va">to_tz</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>local_date_time_chr <span class="op">=</span> <span class="fu">purrr</span><span class="fu">::</span><span class="fu"><a href="https://purrr.tidyverse.org/reference/map2.html" class="external-link">map2</a></span><span class="op">(</span><span class="va">meeting</span>, <span class="va">tz</span>, <span class="va">time_to_local</span><span class="op">)</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">tidyr</span><span class="fu">::</span><span class="fu"><a href="https://tidyr.tidyverse.org/reference/unnest.html" class="external-link">unnest</a></span><span class="op">(</span><span class="va">local_date_time_chr</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>local_time_date_utc <span class="op">=</span> </span>
-<span>                  <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd_hms.html" class="external-link">ymd_hms</a></span><span class="op">(</span><span class="va">local_date_time_chr</span>, tz <span class="op">=</span> <span class="st">"UTC"</span><span class="op">)</span><span class="op">)</span>  <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>local_time <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd_hms.html" class="external-link">ymd_hms</a></span><span class="op">(</span><span class="va">local_date_time_chr</span><span class="op">)</span><span class="op">)</span>  <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>local_time <span class="op">=</span> <span class="fu">hms</span><span class="fu">::</span><span class="fu"><a href="https://hms.tidyverse.org/reference/hms.html" class="external-link">as_hms</a></span><span class="op">(</span><span class="va">local_time</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>local_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">local_date_time_chr</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>local_wday <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/day.html" class="external-link">wday</a></span><span class="op">(</span><span class="va">local_date</span>, label <span class="op">=</span> <span class="cn">T</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">local_date</span>, <span class="va">local_time</span><span class="op">)</span> <span class="op">%&gt;%</span></span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">local_date_time_chr</span><span class="op">)</span></span>
+<span>                  <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd_hms.html" class="external-link">ymd_hms</a></span><span class="op">(</span><span class="va">local_date_time_chr</span>, tz <span class="op">=</span> <span class="st">"UTC"</span><span class="op">)</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>local_time <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/ymd_hms.html" class="external-link">ymd_hms</a></span><span class="op">(</span><span class="va">local_date_time_chr</span><span class="op">)</span><span class="op">)</span>  <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>local_time <span class="op">=</span> <span class="fu">hms</span><span class="fu">::</span><span class="fu"><a href="https://hms.tidyverse.org/reference/hms.html" class="external-link">as_hms</a></span><span class="op">(</span><span class="va">local_time</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>local_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/as.Date.html" class="external-link">as.Date</a></span><span class="op">(</span><span class="va">local_date_time_chr</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>local_wday <span class="op">=</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/day.html" class="external-link">wday</a></span><span class="op">(</span><span class="va">local_date</span>, label <span class="op">=</span> <span class="cn">T</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">local_date</span>, <span class="va">local_time</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">local_date_time_chr</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span></span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>local_wday_date <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">local_wday</span>, <span class="st">", "</span>, <span class="fu"><a href="https://lubridate.tidyverse.org/reference/month.html" class="external-link">month</a></span><span class="op">(</span><span class="va">local_date</span>, label <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>, <span class="st">" "</span>, <span class="fu"><a href="https://lubridate.tidyverse.org/reference/day.html" class="external-link">day</a></span><span class="op">(</span><span class="va">local_date</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span></span>
 <span><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 6 × 6</span></span>
+<span><span class="co">#&gt;   tz        local_time_date_utc local_time local_date local_wday local_wday_date</span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;     &lt;dttm&gt;              &lt;time&gt;     &lt;date&gt;     &lt;ord&gt;      &lt;chr&gt;          </span></span>
+<span><span class="co">#&gt; 1 US/Pacif… 2024-03-27 11:00:00 11:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt; 2 US/Mount… 2024-03-27 12:00:00 12:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt; 3 US/Centr… 2024-03-27 13:00:00 13:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt; 4 US/Easte… 2024-03-27 14:00:00 14:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt; 5 America/… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt; 6 America/… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27</span></span></code></pre></div>
 </div>
 <div class="section level3">
 <h3 id="local_tzs_df_collapse">
 <code>local_tzs_df_collapse()</code><a class="anchor" aria-label="anchor" href="#local_tzs_df_collapse"></a>
 </h3>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<p>If it turns out that you have multiple tz with the same local meeting time, you can collapse these locations by local time.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">local_tzs_df_collapse</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">local_tzs_df</span>, <span class="va">collapse</span> <span class="op">=</span> <span class="st">"; "</span><span class="op">)</span><span class="op">{</span></span>
 <span>  </span>
 <span>  <span class="va">local_tzs_df</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">group_by</span><span class="op">(</span><span class="va">local_time</span>, <span class="va">local_date</span>, <span class="va">local_wday</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">summarise</span><span class="op">(</span>locations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">tz</span>, collapse <span class="op">=</span> <span class="va">collapse</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">ungroup</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">select</span><span class="op">(</span><span class="va">locations</span>, <span class="fu">everything</span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>    <span class="fu">mutate</span><span class="op">(</span>locations <span class="op">=</span> <span class="fu">str_remove_all</span><span class="op">(</span><span class="va">locations</span>, <span class="st">"Europe/|America/|Australia/"</span><span class="op">)</span><span class="op">)</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">group_by</a></span><span class="op">(</span><span class="va">local_date</span>, <span class="va">local_time</span>, <span class="va">local_wday_date</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/summarise.html" class="external-link">summarise</a></span><span class="op">(</span>locations <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">tz</span>, collapse <span class="op">=</span> <span class="va">collapse</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/group_by.html" class="external-link">ungroup</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="va">locations</span>, <span class="fu"><a href="https://tidyselect.r-lib.org/reference/everything.html" class="external-link">everything</a></span><span class="op">(</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>locations <span class="op">=</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_remove.html" class="external-link">str_remove_all</a></span><span class="op">(</span><span class="va">locations</span>, <span class="st">"Europe/|America/|Australia/"</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/arrange.html" class="external-link">arrange</a></span><span class="op">(</span><span class="va">local_date</span>, <span class="va">local_time</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>location <span class="op">=</span> <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_inorder.html" class="external-link">fct_inorder</a></span><span class="op">(</span><span class="va">locations</span><span class="op">)</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>    <span class="fu"><a href="https://dplyr.tidyverse.org/reference/select.html" class="external-link">select</a></span><span class="op">(</span><span class="op">-</span><span class="va">local_date</span><span class="op">)</span></span>
 <span>  </span>
 <span><span class="op">}</span></span></code></pre></div>
-<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 6 × 5</span></span>
-<span><span class="co">#&gt;   tz                   local_time_date_utc local_time local_date local_wday</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;                &lt;dttm&gt;              &lt;time&gt;     &lt;date&gt;     &lt;ord&gt;     </span></span>
-<span><span class="co">#&gt; 1 US/Pacific           2024-03-27 11:00:00 11:00      2024-03-27 Wed       </span></span>
-<span><span class="co">#&gt; 2 US/Mountain          2024-03-27 12:00:00 12:00      2024-03-27 Wed       </span></span>
-<span><span class="co">#&gt; 3 US/Central           2024-03-27 13:00:00 13:00      2024-03-27 Wed       </span></span>
-<span><span class="co">#&gt; 4 US/Eastern           2024-03-27 14:00:00 14:00      2024-03-27 Wed       </span></span>
-<span><span class="co">#&gt; 5 America/Buenos_Aires 2024-03-27 15:00:00 15:00      2024-03-27 Wed       </span></span>
-<span><span class="co">#&gt; 6 America/Santiago     2024-03-27 15:00:00 15:00      2024-03-27 Wed</span></span>
-<span></span>
-<span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<p>This is the type of information you might send to an attendees list so they can know, at a glance, their likelihood of making attending work.</p>
+<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">local_tzs_df_collapse</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `summarise()` has grouped output by 'local_time', 'local_date'. You can</span></span>
+<span><span class="co">#&gt; `summarise()` has grouped output by 'local_date', 'local_time'. You can</span></span>
 <span><span class="co">#&gt; override using the `.groups` argument.</span></span>
 <span><span class="co">#&gt; # A tibble: 6 × 4</span></span>
-<span><span class="co">#&gt;   locations         local_time local_date local_wday</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;             &lt;time&gt;     &lt;date&gt;     &lt;ord&gt;     </span></span>
-<span><span class="co">#&gt; 1 Adelaide          04:30      2024-03-28 Thu       </span></span>
-<span><span class="co">#&gt; 2 Melbourne; Sydney 05:00      2024-03-28 Thu       </span></span>
-<span><span class="co">#&gt; 3 US/Pacific        11:00      2024-03-27 Wed       </span></span>
-<span><span class="co">#&gt; 4 US/Mountain       12:00      2024-03-27 Wed       </span></span>
-<span><span class="co">#&gt; 5 US/Central        13:00      2024-03-27 Wed       </span></span>
-<span><span class="co">#&gt; 6 US/Eastern        14:00      2024-03-27 Wed</span></span></code></pre></div>
+<span><span class="co">#&gt;   locations                         local_time local_wday_date location         </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                             &lt;time&gt;     &lt;chr&gt;           &lt;fct&gt;            </span></span>
+<span><span class="co">#&gt; 1 US/Pacific                        11:00      Wed, Mar 27     US/Pacific       </span></span>
+<span><span class="co">#&gt; 2 US/Mountain                       12:00      Wed, Mar 27     US/Mountain      </span></span>
+<span><span class="co">#&gt; 3 US/Central                        13:00      Wed, Mar 27     US/Central       </span></span>
+<span><span class="co">#&gt; 4 US/Eastern                        14:00      Wed, Mar 27     US/Eastern       </span></span>
+<span><span class="co">#&gt; 5 Buenos_Aires; Santiago; Sao_Paulo 15:00      Wed, Mar 27     Buenos_Aires; Sa…</span></span>
+<span><span class="co">#&gt; 6 London                            18:00      Wed, Mar 27     London</span></span></code></pre></div>
+</div>
 </div>
 </div>
 <div class="section level1">
 <h1 id="more-charming-display">More charming display…<a class="anchor" aria-label="anchor" href="#more-charming-display"></a>
 </h1>
-<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<p>You can of course display in a nicer way, passing to html table maker for example.</p>
+<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">local_tzs_df_collapse</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">knitr</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/knitr/man/kable.html" class="external-link">kable</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `summarise()` has grouped output by 'local_time', 'local_date'. You can</span></span>
+<span><span class="co">#&gt; `summarise()` has grouped output by 'local_date', 'local_time'. You can</span></span>
 <span><span class="co">#&gt; override using the `.groups` argument.</span></span></code></pre></div>
 <table class="table">
+<colgroup>
+<col width="35%">
+<col width="11%">
+<col width="17%">
+<col width="35%">
+</colgroup>
 <thead><tr class="header">
 <th align="left">locations</th>
 <th align="left">local_time</th>
-<th align="left">local_date</th>
-<th align="left">local_wday</th>
+<th align="left">local_wday_date</th>
+<th align="left">location</th>
 </tr></thead>
 <tbody>
 <tr class="odd">
-<td align="left">Adelaide</td>
-<td align="left">04:30:00</td>
-<td align="left">2024-03-28</td>
-<td align="left">Thu</td>
-</tr>
-<tr class="even">
-<td align="left">Melbourne; Sydney</td>
-<td align="left">05:00:00</td>
-<td align="left">2024-03-28</td>
-<td align="left">Thu</td>
-</tr>
-<tr class="odd">
 <td align="left">US/Pacific</td>
 <td align="left">11:00:00</td>
-<td align="left">2024-03-27</td>
-<td align="left">Wed</td>
+<td align="left">Wed, Mar 27</td>
+<td align="left">US/Pacific</td>
 </tr>
 <tr class="even">
 <td align="left">US/Mountain</td>
 <td align="left">12:00:00</td>
-<td align="left">2024-03-27</td>
-<td align="left">Wed</td>
+<td align="left">Wed, Mar 27</td>
+<td align="left">US/Mountain</td>
 </tr>
 <tr class="odd">
 <td align="left">US/Central</td>
 <td align="left">13:00:00</td>
-<td align="left">2024-03-27</td>
-<td align="left">Wed</td>
+<td align="left">Wed, Mar 27</td>
+<td align="left">US/Central</td>
 </tr>
 <tr class="even">
 <td align="left">US/Eastern</td>
 <td align="left">14:00:00</td>
-<td align="left">2024-03-27</td>
-<td align="left">Wed</td>
+<td align="left">Wed, Mar 27</td>
+<td align="left">US/Eastern</td>
 </tr>
 <tr class="odd">
 <td align="left">Buenos_Aires; Santiago; Sao_Paulo</td>
 <td align="left">15:00:00</td>
-<td align="left">2024-03-27</td>
-<td align="left">Wed</td>
+<td align="left">Wed, Mar 27</td>
+<td align="left">Buenos_Aires; Santiago; Sao_Paulo</td>
 </tr>
 <tr class="even">
 <td align="left">London</td>
 <td align="left">18:00:00</td>
-<td align="left">2024-03-27</td>
-<td align="left">Wed</td>
+<td align="left">Wed, Mar 27</td>
+<td align="left">London</td>
 </tr>
 <tr class="odd">
 <td align="left">Amsterdam; Paris; Stockholm; Vienna</td>
 <td align="left">19:00:00</td>
-<td align="left">2024-03-27</td>
-<td align="left">Wed</td>
+<td align="left">Wed, Mar 27</td>
+<td align="left">Amsterdam; Paris; Stockholm; Vienna</td>
+</tr>
+<tr class="even">
+<td align="left">Adelaide</td>
+<td align="left">04:30:00</td>
+<td align="left">Thu, Mar 28</td>
+<td align="left">Adelaide</td>
+</tr>
+<tr class="odd">
+<td align="left">Melbourne; Sydney</td>
+<td align="left">05:00:00</td>
+<td align="left">Thu, Mar 28</td>
+<td align="left">Melbourne; Sydney</td>
 </tr>
 </tbody>
 </table>
-</div>
-<div class="section level1">
-<h1 id="inspiration---global-clocks">Inspiration - global clocks!<a class="anchor" aria-label="anchor" href="#inspiration---global-clocks"></a>
-</h1>
-<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<div class="section level3">
+<h3 id="lets-build-a-wall-of-global-clocks-with-base-ggplot2">Let’s build a wall of global clocks with base ggplot2<a class="anchor" aria-label="anchor" href="#lets-build-a-wall-of-global-clocks-with-base-ggplot2"></a>
+</h3>
+<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">local_tzs_df_collapse</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>minute_turn <span class="op">=</span> <span class="va">local_time</span> <span class="op">%&gt;%</span> </span>
-<span>           <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/minute.html" class="external-link">minute</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="fl">60</span> <span class="op">/</span> <span class="fl">60</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>hour_turn <span class="op">=</span> <span class="va">local_time</span> <span class="op">%&gt;%</span> </span>
-<span>           <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/hour.html" class="external-link">hour</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="fl">12</span><span class="op">/</span><span class="fl">12</span> <span class="op">+</span> <span class="va">minute_turn</span><span class="op">/</span><span class="fl">12</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">mutate</span><span class="op">(</span>am_pm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">local_time</span> <span class="op">%&gt;%</span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/hour.html" class="external-link">hour</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">12</span>, <span class="st">"pm"</span>, <span class="st">"am"</span><span class="op">)</span><span class="op">)</span> <span class="op">%&gt;%</span> </span>
-<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span> <span class="fu">str_wrap</span><span class="op">(</span><span class="va">locations</span>, <span class="fl">15</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span>  <span class="va">hour_turn</span>, </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>minute_turn <span class="op">=</span> <span class="va">local_time</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>           <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/minute.html" class="external-link">minute</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="fl">60</span> <span class="op">/</span> <span class="fl">60</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>hour_turn <span class="op">=</span> <span class="va">local_time</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>           <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/hour.html" class="external-link">hour</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="fl">12</span><span class="op">/</span><span class="fl">12</span> <span class="op">+</span> <span class="va">minute_turn</span><span class="op">/</span><span class="fl">12</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>am_pm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">local_time</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/hour.html" class="external-link">hour</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&gt;=</span> <span class="fl">12</span>, <span class="st">"pm"</span>, <span class="st">"am"</span><span class="op">)</span><span class="op">)</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span> <span class="fu"><a href="https://stringr.tidyverse.org/reference/str_wrap.html" class="external-link">str_wrap</a></span><span class="op">(</span><span class="va">locations</span>, <span class="fl">15</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span>  <span class="va">hour_turn</span>, </span>
 <span>      xend <span class="op">=</span>  <span class="va">hour_turn</span>,</span>
 <span>      y <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>      yend <span class="op">=</span> <span class="fl">.6</span>,</span>
 <span>      color <span class="op">=</span> <span class="va">am_pm</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">labs</span><span class="op">(</span>color <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_segment</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">geom_segment</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>x <span class="op">=</span>  <span class="va">minute_turn</span>, </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>color <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html" class="external-link">geom_segment</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_segment.html" class="external-link">geom_segment</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>x <span class="op">=</span>  <span class="va">minute_turn</span>, </span>
 <span>                  xend <span class="op">=</span>  <span class="va">minute_turn</span> ,</span>
 <span>               yend <span class="op">=</span> <span class="fl">1</span><span class="op">)</span> <span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">coord_polar</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">scale_x_continuous</span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">geom_text</span><span class="op">(</span>data <span class="op">=</span> <span class="fu">tibble</span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">12</span>, y <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, </span>
-<span>            <span class="fu">aes</span><span class="op">(</span>label <span class="op">=</span> <span class="va">x</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">/</span><span class="fl">12</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="cn">NULL</span>, </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html" class="external-link">coord_polar</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="https://tibble.tidyverse.org/reference/tibble.html" class="external-link">tibble</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">12</span>, y <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, </span>
+<span>            <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="va">x</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">/</span><span class="fl">12</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="cn">NULL</span>, </span>
 <span>                yend <span class="op">=</span> <span class="cn">NULL</span>, color <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>,</span>
 <span>            show.legend <span class="op">=</span> <span class="cn">F</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">theme_void</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">annotate</span><span class="op">(</span>geom <span class="op">=</span> <span class="st">"segment"</span>, x <span class="op">=</span> <span class="fl">0</span>, xend <span class="op">=</span> <span class="fl">1</span>, y <span class="op">=</span> <span class="fl">1.2</span>, yend <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `summarise()` has grouped output by 'local_time', 'local_date'. You can</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_void</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span>geom <span class="op">=</span> <span class="st">"segment"</span>, x <span class="op">=</span> <span class="fl">0</span>, xend <span class="op">=</span> <span class="fl">1</span>, y <span class="op">=</span> <span class="fl">1.2</span>, yend <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span>
+<span><span class="co">#&gt; `summarise()` has grouped output by 'local_date', 'local_time'. You can</span></span>
 <span><span class="co">#&gt; override using the `.groups` argument.</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-5-1.png" width="100%"></p>
-<div class="section level2">
-<h2 id="practical-more-practical-could-be-wrapped-up-in-a-function--or-app">Practical more practical… (could be wrapped up in a function … or app)<a class="anchor" aria-label="anchor" href="#practical-more-practical-could-be-wrapped-up-in-a-function--or-app"></a>
-</h2>
-<div class="sourceCode" id="cb8"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">local_tzs_df_collapse</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
-<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">aes</span><span class="op">(</span><span class="va">local_time</span>, <span class="fu">fct_inorder</span><span class="op">(</span><span class="fu">str_wrap</span><span class="op">(</span><span class="va">locations</span>,<span class="fl">25</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">labs</span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Local meet time"</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">geom_point</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">annotate</span><span class="op">(</span>geom <span class="op">=</span> <span class="st">"rect"</span>,</span>
-<span>            xmin <span class="op">=</span> <span class="fu">hms</span><span class="fu">::</span><span class="fu"><a href="https://hms.tidyverse.org/reference/hms.html" class="external-link">as_hms</a></span><span class="op">(</span><span class="st">"09:00:00"</span><span class="op">)</span>,</span>
-<span>            xmax <span class="op">=</span> <span class="fu">hms</span><span class="fu">::</span><span class="fu"><a href="https://hms.tidyverse.org/reference/hms.html" class="external-link">as_hms</a></span><span class="op">(</span><span class="st">"17:00:00"</span><span class="op">)</span>,</span>
-<span>            ymin <span class="op">=</span> <span class="op">-</span><span class="cn">Inf</span>,</span>
-<span>            ymax <span class="op">=</span> <span class="cn">Inf</span>,</span>
-<span>           alpha <span class="op">=</span> <span class="fl">.2</span>, </span>
-<span>           fill <span class="op">=</span> <span class="st">"darkolivegreen3"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>    <span class="fu">geom_vline</span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fu">hms</span><span class="fu">::</span><span class="fu"><a href="https://hms.tidyverse.org/reference/hms.html" class="external-link">as_hms</a></span><span class="op">(</span><span class="st">"12:00:00"</span><span class="op">)</span>,</span>
-<span>              linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"grey25"</span>,</span>
-<span>              alpha <span class="op">=</span> <span class="fl">.2</span><span class="op">)</span> <span class="op">+</span></span>
-<span>    <span class="fu">annotate</span><span class="op">(</span>geom <span class="op">=</span> <span class="st">"rect"</span>,</span>
-<span>            xmin <span class="op">=</span> <span class="fu">hms</span><span class="fu">::</span><span class="fu"><a href="https://hms.tidyverse.org/reference/hms.html" class="external-link">as_hms</a></span><span class="op">(</span><span class="st">"07:00:00"</span><span class="op">)</span>,</span>
-<span>            xmax <span class="op">=</span> <span class="fu">hms</span><span class="fu">::</span><span class="fu"><a href="https://hms.tidyverse.org/reference/hms.html" class="external-link">as_hms</a></span><span class="op">(</span><span class="st">"09:00:00"</span><span class="op">)</span>,</span>
-<span>            ymin <span class="op">=</span> <span class="op">-</span><span class="cn">Inf</span>,</span>
-<span>            ymax <span class="op">=</span> <span class="cn">Inf</span>,</span>
-<span>           alpha <span class="op">=</span> <span class="fl">.2</span>, </span>
-<span>           fill <span class="op">=</span> <span class="st">"goldenrod2"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>      <span class="fu">annotate</span><span class="op">(</span>geom <span class="op">=</span> <span class="st">"rect"</span>,</span>
-<span>            xmin <span class="op">=</span> <span class="fu">hms</span><span class="fu">::</span><span class="fu"><a href="https://hms.tidyverse.org/reference/hms.html" class="external-link">as_hms</a></span><span class="op">(</span><span class="st">"17:00:00"</span><span class="op">)</span>,</span>
-<span>            xmax <span class="op">=</span> <span class="fu">hms</span><span class="fu">::</span><span class="fu"><a href="https://hms.tidyverse.org/reference/hms.html" class="external-link">as_hms</a></span><span class="op">(</span><span class="st">"21:00:00"</span><span class="op">)</span>,</span>
-<span>            ymin <span class="op">=</span> <span class="op">-</span><span class="cn">Inf</span>,</span>
-<span>            ymax <span class="op">=</span> <span class="cn">Inf</span>,</span>
-<span>           alpha <span class="op">=</span> <span class="fl">.2</span>, </span>
-<span>           fill <span class="op">=</span> <span class="st">"goldenrod2"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>      <span class="fu">annotate</span><span class="op">(</span>geom <span class="op">=</span> <span class="st">"rect"</span>,</span>
-<span>            xmin <span class="op">=</span> <span class="fu">hms</span><span class="fu">::</span><span class="fu"><a href="https://hms.tidyverse.org/reference/hms.html" class="external-link">as_hms</a></span><span class="op">(</span><span class="st">"00:00:00"</span><span class="op">)</span>,</span>
-<span>            xmax <span class="op">=</span> <span class="fu">hms</span><span class="fu">::</span><span class="fu"><a href="https://hms.tidyverse.org/reference/hms.html" class="external-link">as_hms</a></span><span class="op">(</span><span class="st">"07:00:00"</span><span class="op">)</span>,</span>
-<span>            ymin <span class="op">=</span> <span class="op">-</span><span class="cn">Inf</span>,</span>
-<span>            ymax <span class="op">=</span> <span class="cn">Inf</span>,</span>
-<span>           alpha <span class="op">=</span> <span class="fl">.2</span>, </span>
-<span>           fill <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>        <span class="fu">annotate</span><span class="op">(</span>geom <span class="op">=</span> <span class="st">"rect"</span>,</span>
-<span>            xmin <span class="op">=</span> <span class="fu">hms</span><span class="fu">::</span><span class="fu"><a href="https://hms.tidyverse.org/reference/hms.html" class="external-link">as_hms</a></span><span class="op">(</span><span class="st">"21:00:00"</span><span class="op">)</span>,</span>
-<span>            xmax <span class="op">=</span> <span class="fu">hms</span><span class="fu">::</span><span class="fu"><a href="https://hms.tidyverse.org/reference/hms.html" class="external-link">as_hms</a></span><span class="op">(</span><span class="st">"23:00:00"</span><span class="op">)</span>,</span>
-<span>            ymin <span class="op">=</span> <span class="op">-</span><span class="cn">Inf</span>,</span>
-<span>            ymax <span class="op">=</span> <span class="cn">Inf</span>,</span>
-<span>           alpha <span class="op">=</span> <span class="fl">.2</span>, </span>
-<span>           fill <span class="op">=</span> <span class="st">"black"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">geom_text</span><span class="op">(</span><span class="fu">aes</span><span class="op">(</span>label <span class="op">=</span> <span class="va">local_time</span><span class="op">)</span>,</span>
-<span>            hjust <span class="op">=</span> <span class="op">-</span><span class="fl">.1</span>, show.legend <span class="op">=</span> <span class="cn">F</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">aes</span><span class="op">(</span>color <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste0</a></span><span class="op">(</span><span class="va">local_wday</span>, <span class="st">" "</span>, <span class="fu">month</span><span class="op">(</span><span class="va">local_date</span>, label <span class="op">=</span> <span class="cn">T</span><span class="op">)</span>, <span class="st">", "</span>, <span class="fu">day</span><span class="op">(</span><span class="va">local_date</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">labs</span><span class="op">(</span>color <span class="op">=</span> <span class="st">"Local meet date"</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">theme</span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"top"</span>, </span>
-<span>        legend.justification <span class="op">=</span> <span class="st">"left"</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">theme</span><span class="op">(</span>panel.grid.major.y <span class="op">=</span> <span class="fu">element_blank</span><span class="op">(</span><span class="op">)</span>,</span>
-<span>        panel.grid.minor.y <span class="op">=</span> <span class="fu">element_line</span><span class="op">(</span>color <span class="op">=</span> <span class="st">""</span><span class="op">)</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `summarise()` has grouped output by 'local_time', 'local_date'. You can</span></span>
-<span><span class="co">#&gt; override using the `.groups` argument.</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-6-1.png" width="100%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-7-1.png" width="100%"></p>
 </div>
-</div>
-<div class="section level1">
-<h1 id="part-ii-packaging-and-documentation-">Part II. Packaging and documentation 🚧<a class="anchor" aria-label="anchor" href="#part-ii-packaging-and-documentation-"></a>
-</h1>
 <div class="section level2">
-<h2 id="phase-1-minimal-working-package">Phase 1. Minimal working package<a class="anchor" aria-label="anchor" href="#phase-1-minimal-working-package"></a>
+<h2 id="speed-things-up-by-putting-some-of-this-into-functions">Speed things up by putting some of this into functions<a class="anchor" aria-label="anchor" href="#speed-things-up-by-putting-some-of-this-into-functions"></a>
 </h2>
 <div class="section level3">
-<h3 id="bit-a-created-package-archetecture-running-devtoolscreate-in-interactive-session-">Bit A. Created package archetecture, running <code>devtools::create(".")</code> in interactive session. ✅<a class="anchor" aria-label="anchor" href="#bit-a-created-package-archetecture-running-devtoolscreate-in-interactive-session-"></a>
+<h3 id="gglobalclocks-1">
+<code>gglobalclocks()</code><a class="anchor" aria-label="anchor" href="#gglobalclocks-1"></a>
 </h3>
-<div class="sourceCode" id="cb9"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/create.html" class="external-link">create</a></span><span class="op">(</span><span class="st">"."</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="bit-b-added-roxygen-skeleton-">Bit B. Added roxygen skeleton? 🚧<a class="anchor" aria-label="anchor" href="#bit-b-added-roxygen-skeleton-"></a>
-</h3>
-<p>Use a roxygen skeleton for auto documentation and making sure proposed functions are <em>exported</em>. Generally, early on, I don’t do much (anything) in terms of filling in the skeleton for documentation, because things may change.</p>
-</div>
-<div class="section level3">
-<h3 id="bit-c-managed-dependencies--">Bit C. Managed dependencies ? 🚧<a class="anchor" aria-label="anchor" href="#bit-c-managed-dependencies--"></a>
-</h3>
-<p>Package dependencies managed, i.e. <code>depend::function()</code> in proposed functions and declared in the DESCRIPTION</p>
-<div class="sourceCode" id="cb10"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">usethis</span><span class="fu">::</span><span class="fu"><a href="https://usethis.r-lib.org/reference/use_package.html" class="external-link">use_package</a></span><span class="op">(</span><span class="st">"dplyr"</span><span class="op">)</span></span>
-<span><span class="fu">usethis</span><span class="fu">::</span><span class="fu"><a href="https://usethis.r-lib.org/reference/use_package.html" class="external-link">use_package</a></span><span class="op">(</span> <span class="st">"hms"</span><span class="op">)</span></span>
-<span><span class="fu">usethis</span><span class="fu">::</span><span class="fu"><a href="https://usethis.r-lib.org/reference/use_package.html" class="external-link">use_package</a></span><span class="op">(</span> <span class="st">"lubridate"</span><span class="op">)</span></span>
-<span><span class="fu">usethis</span><span class="fu">::</span><span class="fu"><a href="https://usethis.r-lib.org/reference/use_package.html" class="external-link">use_package</a></span><span class="op">(</span> <span class="st">"purrr"</span><span class="op">)</span></span>
-<span><span class="fu">usethis</span><span class="fu">::</span><span class="fu"><a href="https://usethis.r-lib.org/reference/use_package.html" class="external-link">use_package</a></span><span class="op">(</span> <span class="st">"tidyr"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="bit-d-moved-functions-r-folder-">Bit D. Moved functions R folder? ✅<a class="anchor" aria-label="anchor" href="#bit-d-moved-functions-r-folder-"></a>
-</h3>
-<p>Use new {readme2pkg} function to do this from readme…</p>
 <div class="sourceCode" id="cb11"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">readme2pkg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readme2pkg/man/chunk_to_r.html" class="external-link">chunk_to_r</a></span><span class="op">(</span><span class="st">"date_time_tz_to_tzs"</span><span class="op">)</span></span>
-<span><span class="fu">readme2pkg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readme2pkg/man/chunk_to_r.html" class="external-link">chunk_to_r</a></span><span class="op">(</span><span class="st">"local_tzs_df_collapse"</span><span class="op">)</span></span>
-<span><span class="fu">readme2pkg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readme2pkg/man/chunk_to_r.html" class="external-link">chunk_to_r</a></span><span class="op">(</span><span class="st">"time_to_local"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="bit-e-run-devtoolscheck-and-addressed-errors-">Bit E. Run <code>devtools::check()</code> and addressed errors. 🚧<a class="anchor" aria-label="anchor" href="#bit-e-run-devtoolscheck-and-addressed-errors-"></a>
-</h3>
-<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">check</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="st">"."</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="bit-f-build-package--">Bit F. Build package 🚧 ✅<a class="anchor" aria-label="anchor" href="#bit-f-build-package--"></a>
-</h3>
-<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/build.html" class="external-link">build</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="bit-g-write-traditional-readme-that-uses-built-package-also-serves-as-a-test-of-build-">Bit G. Write traditional README that uses built package (also serves as a test of build. ✅<a class="anchor" aria-label="anchor" href="#bit-g-write-traditional-readme-that-uses-built-package-also-serves-as-a-test-of-build-"></a>
-</h3>
-<p>The goal of the {ggchalkboard} package is to make it easy to theme ggplots like chalkboards</p>
-<p>Install package with:</p>
-<div class="sourceCode" id="cb14"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"EvaMaeRey/ggchalkboard"</span>)</span></code></pre></div>
-<p>Once functions are exported you can remove go to two colons, and when things are are really finalized, then go without colons (and rearrange your readme…)</p>
-<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">gglobalclocks</span><span class="op">)</span>  </span>
-<span></span>
-<span><span class="fu">gglobalclocks</span><span class="fu">:::</span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span><span class="st">"2024-03-06 11:00:00"</span>, </span>
-<span>                                    from_tz <span class="op">=</span> <span class="st">"US/Mountain"</span>,</span>
-<span>                                    to_tz <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"US/Eastern"</span>,</span>
-<span>                                              <span class="st">"US/Mountain"</span>,</span>
-<span>                                              <span class="st">"US/Pacific"</span>,</span>
-<span>                                              <span class="st">"Europe/Paris"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="bit-h-chosen-a-license-">Bit H. Chosen a license? ✅<a class="anchor" aria-label="anchor" href="#bit-h-chosen-a-license-"></a>
-</h3>
-<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">usethis</span><span class="fu">::</span><span class="fu"><a href="https://usethis.r-lib.org/reference/licenses.html" class="external-link">use_mit_license</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3">
-<h3 id="bit-i-add-lifecycle-badge-experimental-">Bit I. Add lifecycle badge (experimental) ✅<a class="anchor" aria-label="anchor" href="#bit-i-add-lifecycle-badge-experimental-"></a>
-</h3>
-<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">usethis</span><span class="fu">::</span><span class="fu"><a href="https://usethis.r-lib.org/reference/badges.html" class="external-link">use_lifecycle_badge</a></span><span class="op">(</span><span class="st">"experimental"</span><span class="op">)</span></span></code></pre></div>
-</div>
-</div>
-<div class="section level2">
-<h2 id="phase-2-listen--iterate-">Phase 2: Listen &amp; iterate 🚧<a class="anchor" aria-label="anchor" href="#phase-2-listen--iterate-"></a>
-</h2>
-<p>Try to get feedback from experts on API, implementation, default decisions. Is there already work that solves this problem?</p>
-</div>
-<div class="section level2">
-<h2 id="phase-3-let-things-settle">Phase 3: Let things settle<a class="anchor" aria-label="anchor" href="#phase-3-let-things-settle"></a>
-</h2>
-<div class="section level3"><h3 id="bit-a-settle-on-examples-put-them-in-the-roxygen-skeleton-and-readme-">Bit A. Settle on examples. Put them in the roxygen skeleton and readme. 🚧<a class="anchor" aria-label="anchor" href="#bit-a-settle-on-examples-put-them-in-the-roxygen-skeleton-and-readme-"></a>
-</h3></div>
-<div class="section level3">
-<h3 id="bit-b-written-formal-tests-of-functions-and-save-to-test-that-folders-">Bit B. Written formal tests of functions and save to test that folders 🚧<a class="anchor" aria-label="anchor" href="#bit-b-written-formal-tests-of-functions-and-save-to-test-that-folders-"></a>
-</h3>
-<p>That would look like this…</p>
-<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://testthat.r-lib.org" class="external-link">testthat</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that</a></span><span class="op">(</span><span class="st">"calc times 2 works"</span>, <span class="op">{</span></span>
-<span>  <span class="fu"><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">expect_equal</a></span><span class="op">(</span><span class="fu">times_two</span><span class="op">(</span><span class="fl">4</span><span class="op">)</span>, <span class="fl">8</span><span class="op">)</span></span>
-<span>  <span class="fu"><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">expect_equal</a></span><span class="op">(</span><span class="fu">times_two</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span>, <span class="fl">10</span><span class="op">)</span></span>
-<span>  </span>
-<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
-<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">readme2pkg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readme2pkg/man/chunk_to_tests_testthat.html" class="external-link">chunk_to_tests_testthat</a></span><span class="op">(</span><span class="st">"test_calc_times_two_works"</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3"><h3 id="bit-c-added-a-description-and-author-information-in-the-description-file-">Bit C. Added a description and author information in the DESCRIPTION file 🚧<a class="anchor" aria-label="anchor" href="#bit-c-added-a-description-and-author-information-in-the-description-file-"></a>
-</h3></div>
-<div class="section level3"><h3 id="bit-d-addressed-all-notes-warnings-and-errors-">Bit D. Addressed <em>all</em> notes, warnings and errors. 🚧<a class="anchor" aria-label="anchor" href="#bit-d-addressed-all-notes-warnings-and-errors-"></a>
-</h3></div>
-</div>
-<div class="section level2">
-<h2 id="phase-4-promote-to-wider-audience">Phase 4. Promote to wider audience…<a class="anchor" aria-label="anchor" href="#phase-4-promote-to-wider-audience"></a>
-</h2>
-<div class="section level3">
-<h3 id="bit-a-package-website-built-">Bit A. Package website built? ✅<a class="anchor" aria-label="anchor" href="#bit-a-package-website-built-"></a>
-</h3>
-<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">usethis</span><span class="fu">::</span><span class="fu"><a href="https://usethis.r-lib.org/reference/use_pkgdown.html" class="external-link">use_pkgdown</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="fu">pkgdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgdown.r-lib.org/reference/build_site.html" class="external-link">build_site</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-</div>
-<div class="section level3"><h3 id="bit-b-package-website-deployed--">Bit B. Package website deployed? 🚧 ✅<a class="anchor" aria-label="anchor" href="#bit-b-package-website-deployed--"></a>
-</h3></div>
-</div>
-<div class="section level2">
-<h2 id="phase-5-hardencommit">Phase 5: Harden/commit<a class="anchor" aria-label="anchor" href="#phase-5-hardencommit"></a>
-</h2>
-<div class="section level3"><h3 id="submit-to-cranruniverse-">Submit to CRAN/RUniverse? 🚧<a class="anchor" aria-label="anchor" href="#submit-to-cranruniverse-"></a>
-</h3></div>
-</div>
-</div>
-<div class="section level1">
-<h1 id="appendix-reports-environment">Appendix: Reports, Environment<a class="anchor" aria-label="anchor" href="#appendix-reports-environment"></a>
-</h1>
-<div class="section level2">
-<h2 id="edit-description-file">Edit Description file<a class="anchor" aria-label="anchor" href="#edit-description-file"></a>
-</h2>
-<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span><span class="st">"DESCRIPTION"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "Package: gglobalclocks"                             </span></span>
-<span><span class="co">#&gt;  [2] "Title: What the Package Does (One Line, Title Case)"</span></span>
-<span><span class="co">#&gt;  [3] "Version: 0.0.0.9000"                                </span></span>
-<span><span class="co">#&gt;  [4] "Authors@R: "                                        </span></span>
-<span><span class="co">#&gt;  [5] "    person(given = \"First\","                      </span></span>
-<span><span class="co">#&gt;  [6] "           family = \"Last\","                      </span></span>
-<span><span class="co">#&gt;  [7] "           role = c(\"aut\", \"cre\"),"             </span></span>
-<span><span class="co">#&gt;  [8] "           email = \"first.last@example.com\","     </span></span>
-<span><span class="co">#&gt;  [9] "           comment = c(ORCID = \"YOUR-ORCID-ID\"))" </span></span>
-<span><span class="co">#&gt; [10] "Description: What the package does (one paragraph)."</span></span>
-<span><span class="co">#&gt; [11] "License: MIT + file LICENSE"                        </span></span>
-<span><span class="co">#&gt; [12] "Encoding: UTF-8"                                    </span></span>
-<span><span class="co">#&gt; [13] "LazyData: true"                                     </span></span>
-<span><span class="co">#&gt; [14] "Roxygen: list(markdown = TRUE)"                     </span></span>
-<span><span class="co">#&gt; [15] "RoxygenNote: 7.1.1"                                 </span></span>
-<span><span class="co">#&gt; [16] "Imports: "                                          </span></span>
-<span><span class="co">#&gt; [17] "    dplyr,"                                         </span></span>
-<span><span class="co">#&gt; [18] "    hms,"                                           </span></span>
-<span><span class="co">#&gt; [19] "    lubridate,"                                     </span></span>
-<span><span class="co">#&gt; [20] "    purrr,"                                         </span></span>
-<span><span class="co">#&gt; [21] "    tidyr"</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="environment">Environment<a class="anchor" aria-label="anchor" href="#environment"></a>
-</h2>
-<p>Here I just want to print the packages and the versions</p>
-<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output</a></span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="va">all</span><span class="op">[</span><span class="fl">11</span><span class="op">:</span><span class="fl">20</span><span class="op">]</span></span>
-<span><span class="co">#&gt;  [1] ""                                                                         </span></span>
-<span><span class="co">#&gt;  [2] "attached base packages:"                                                  </span></span>
-<span><span class="co">#&gt;  [3] "[1] stats     graphics  grDevices utils     datasets  methods   base     "</span></span>
-<span><span class="co">#&gt;  [4] ""                                                                         </span></span>
-<span><span class="co">#&gt;  [5] "other attached packages:"                                                 </span></span>
-<span><span class="co">#&gt;  [6] " [1] lubridate_1.9.2      forcats_1.0.0        stringr_1.5.0       "      </span></span>
-<span><span class="co">#&gt;  [7] " [4] dplyr_1.1.0          purrr_1.0.1          readr_2.1.4         "      </span></span>
-<span><span class="co">#&gt;  [8] " [7] tidyr_1.3.0          tibble_3.2.1         ggplot2_3.4.4.9000  "      </span></span>
-<span><span class="co">#&gt;  [9] "[10] tidyverse_2.0.0.9000"                                                </span></span>
-<span><span class="co">#&gt; [10] ""</span></span></code></pre></div>
-</div>
-<div class="section level2">
-<h2 id="devtoolscheck-report">
-<code>devtools::check()</code> report<a class="anchor" aria-label="anchor" href="#devtoolscheck-report"></a>
-</h2>
-<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">check</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="st">"."</span><span class="op">)</span></span></code></pre></div>
-<p>What would gglobalclocks syntax look like using above approach as jumping off point?</p>
-<div class="sourceCode" id="cb24"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1"></a><span class="kw">gglobalclocks</span>() <span class="op">+</span><span class="st"> </span><span class="co"># wraps up theme void and coord_polar </span></span>
-<span id="cb24-2"><a href="#cb24-2"></a><span class="st"> </span><span class="kw">stamp_clockface</span>() <span class="op">+</span><span class="st"> </span><span class="co"># wraps up drawing numbers and circle</span></span>
-<span id="cb24-3"><a href="#cb24-3"></a><span class="st"> </span><span class="kw">aes</span>(<span class="dt">local_date_time =</span> date_timevar) <span class="op">+</span><span class="st"> </span></span>
-<span id="cb24-4"><a href="#cb24-4"></a><span class="st"> </span><span class="kw">geom_clockhands</span>() <span class="op">+</span><span class="st"> </span></span>
-<span id="cb24-5"><a href="#cb24-5"></a><span class="st"> </span><span class="kw">facet_wrap</span>(<span class="op">~</span>location)</span></code></pre></div>
-</div>
-</div>
-<div class="section level1">
-<h1 id="returning-to-the-actual-global-clocks-idea">returning to the actual global clocks idea.<a class="anchor" aria-label="anchor" href="#returning-to-the-actual-global-clocks-idea"></a>
-</h1>
-<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">gglobalclocks</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span> <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span><span class="op">{</span></span>
 <span>  </span>
-<span>  <span class="fu">ggplot</span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">theme_void</span><span class="op">(</span><span class="op">)</span>,</span>
-<span>       <span class="fu">coord_polar</span><span class="op">(</span><span class="op">)</span>,</span>
-<span>       <span class="fu">scale_x_continuous</span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
-<span>       <span class="fu">scale_y_continuous</span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1.3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="va">data</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggtheme.html" class="external-link">theme_void</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>       <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/coord_polar.html" class="external-link">coord_polar</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>       <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_x_continuous</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>       <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/scale_continuous.html" class="external-link">scale_y_continuous</a></span><span class="op">(</span>limits <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fl">0</span>,<span class="fl">1.3</span><span class="op">)</span><span class="op">)</span><span class="op">)</span></span>
 <span>  </span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="fu">gglobalclocks</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-20-1.png" width="100%"></p>
-<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
-<span><span class="va">stamp_clockface</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span></span>
+<span><span class="op">}</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="stamp_clockface">
+<code>stamp_clockface()</code><a class="anchor" aria-label="anchor" href="#stamp_clockface"></a>
+</h3>
+<div class="sourceCode" id="cb12"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">stamp_clockface</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span></span>
 <span>  </span>
-<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">geom_text</span><span class="op">(</span>data <span class="op">=</span> <span class="fu">tibble</span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">12</span>, y <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, </span>
-<span>            <span class="fu">aes</span><span class="op">(</span>label <span class="op">=</span> <span class="va">x</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">/</span><span class="fl">12</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="cn">NULL</span>, </span>
+<span>    <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>x <span class="op">=</span> <span class="fl">1</span><span class="op">:</span><span class="fl">12</span>, y <span class="op">=</span> <span class="fl">1</span><span class="op">)</span>, </span>
+<span>            <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="va">x</span>, x <span class="op">=</span> <span class="va">x</span><span class="op">/</span><span class="fl">12</span>, y <span class="op">=</span> <span class="va">y</span>, xend <span class="op">=</span> <span class="cn">NULL</span>, </span>
 <span>                yend <span class="op">=</span> <span class="cn">NULL</span>, color <span class="op">=</span> <span class="cn">NULL</span>, local_time <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>,</span>
 <span>            show.legend <span class="op">=</span> <span class="cn">F</span><span class="op">)</span>,</span>
-<span>          <span class="fu">annotate</span><span class="op">(</span>geom <span class="op">=</span> <span class="st">"segment"</span>, x <span class="op">=</span> <span class="fl">0</span>, xend <span class="op">=</span> <span class="fl">1</span>, y <span class="op">=</span> <span class="fl">1.2</span>, yend <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span>
+<span>          <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/annotate.html" class="external-link">annotate</a></span><span class="op">(</span>geom <span class="op">=</span> <span class="st">"segment"</span>, x <span class="op">=</span> <span class="fl">0</span>, xend <span class="op">=</span> <span class="fl">1</span>, y <span class="op">=</span> <span class="fl">1.2</span>, yend <span class="op">=</span> <span class="fl">1.2</span><span class="op">)</span></span>
 <span>         </span>
 <span>    <span class="op">)</span></span>
 <span>  </span>
-<span><span class="op">}</span></span>
-<span></span>
-<span><span class="fu">gglobalclocks</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">stamp_clockface</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-20-2.png" width="100%"></p>
-<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb13"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">gglobalclocks</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> <span class="fu">stamp_clockface</span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-8-1.png" width="100%"></p>
+</div>
+<div class="section level3">
+<h3 id="statclockhourhand">
+<code>statClockhourhand</code><a class="anchor" aria-label="anchor" href="#statclockhourhand"></a>
+</h3>
+<div class="sourceCode" id="cb14"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># there's probably a lot of fun to be had refactoring this!</span></span>
+<span><span class="co"># seems quite verbose</span></span>
 <span><span class="va">compute_clock_hands</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">data</span><span class="op">)</span><span class="op">{</span></span>
 <span>  </span>
 <span>  <span class="va">data</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>minute_turn <span class="op">=</span> <span class="va">local_time</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/minute.html" class="external-link">minute</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="fl">60</span> <span class="op">/</span> <span class="fl">60</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>hour_turn <span class="op">=</span> <span class="va">local_time</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/hour.html" class="external-link">hour</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="fl">12</span><span class="op">/</span><span class="fl">12</span> <span class="op">+</span> <span class="va">minute_turn</span><span class="op">/</span><span class="fl">12</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
+<span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>hour_turn <span class="op">=</span> <span class="va">local_time</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/hour.html" class="external-link">hour</a></span><span class="op">(</span><span class="op">)</span> <span class="op"><a href="https://rdrr.io/r/base/Arithmetic.html" class="external-link">%%</a></span> <span class="fl">12</span><span class="op">/</span><span class="fl">12</span> <span class="op">+</span> <span class="va">minute_turn</span><span class="op">/</span><span class="fl">12</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">dplyr</span><span class="fu">::</span><span class="fu"><a href="https://dplyr.tidyverse.org/reference/mutate.html" class="external-link">mutate</a></span><span class="op">(</span>am_pm <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/ifelse.html" class="external-link">ifelse</a></span><span class="op">(</span><span class="va">local_time</span> <span class="op"><a href="https://magrittr.tidyverse.org/reference/pipe.html" class="external-link">%&gt;%</a></span> <span class="fu">lubridate</span><span class="fu">::</span><span class="fu"><a href="https://lubridate.tidyverse.org/reference/hour.html" class="external-link">hour</a></span><span class="op">(</span><span class="op">)</span> <span class="op">&gt;</span> <span class="fl">12</span>, <span class="st">"pm"</span>, <span class="st">"am"</span><span class="op">)</span><span class="op">)</span> </span>
 <span>  </span>
 <span><span class="op">}</span></span>
@@ -595,50 +421,8 @@
 <span>  </span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">compute_clock_hands</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 15 × 8</span></span>
-<span><span class="co">#&gt;    tz           local_time_date_utc local_time local_date local_wday minute_turn</span></span>
-<span><span class="co">#&gt;    &lt;chr&gt;        &lt;dttm&gt;              &lt;time&gt;     &lt;date&gt;     &lt;ord&gt;            &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1 US/Pacific   2024-03-27 11:00:00 11:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt;  2 US/Mountain  2024-03-27 12:00:00 12:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt;  3 US/Central   2024-03-27 13:00:00 13:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt;  4 US/Eastern   2024-03-27 14:00:00 14:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt;  5 America/Bue… 2024-03-27 15:00:00 15:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt;  6 America/San… 2024-03-27 15:00:00 15:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt;  7 America/Sao… 2024-03-27 15:00:00 15:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt;  8 Europe/Lond… 2024-03-27 18:00:00 18:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt;  9 Europe/Amst… 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt; 10 Europe/Paris 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt; 11 Europe/Stoc… 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt; 12 Europe/Vien… 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt; 13 Australia/A… 2024-03-28 04:30:00 04:30      2024-03-28 Thu                0.5</span></span>
-<span><span class="co">#&gt; 14 Australia/M… 2024-03-28 05:00:00 05:00      2024-03-28 Thu                0  </span></span>
-<span><span class="co">#&gt; 15 Australia/S… 2024-03-28 05:00:00 05:00      2024-03-28 Thu                0  </span></span>
-<span><span class="co">#&gt; # ℹ 2 more variables: hour_turn &lt;dbl&gt;, am_pm &lt;chr&gt;</span></span>
-<span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">compute_minute_hand</span><span class="op">(</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 15 × 12</span></span>
-<span><span class="co">#&gt;    tz           local_time_date_utc local_time local_date local_wday minute_turn</span></span>
-<span><span class="co">#&gt;    &lt;chr&gt;        &lt;dttm&gt;              &lt;time&gt;     &lt;date&gt;     &lt;ord&gt;            &lt;dbl&gt;</span></span>
-<span><span class="co">#&gt;  1 US/Pacific   2024-03-27 11:00:00 11:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt;  2 US/Mountain  2024-03-27 12:00:00 12:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt;  3 US/Central   2024-03-27 13:00:00 13:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt;  4 US/Eastern   2024-03-27 14:00:00 14:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt;  5 America/Bue… 2024-03-27 15:00:00 15:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt;  6 America/San… 2024-03-27 15:00:00 15:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt;  7 America/Sao… 2024-03-27 15:00:00 15:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt;  8 Europe/Lond… 2024-03-27 18:00:00 18:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt;  9 Europe/Amst… 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt; 10 Europe/Paris 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt; 11 Europe/Stoc… 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt; 12 Europe/Vien… 2024-03-27 19:00:00 19:00      2024-03-27 Wed                0  </span></span>
-<span><span class="co">#&gt; 13 Australia/A… 2024-03-28 04:30:00 04:30      2024-03-28 Thu                0.5</span></span>
-<span><span class="co">#&gt; 14 Australia/M… 2024-03-28 05:00:00 05:00      2024-03-28 Thu                0  </span></span>
-<span><span class="co">#&gt; 15 Australia/S… 2024-03-28 05:00:00 05:00      2024-03-28 Thu                0  </span></span>
-<span><span class="co">#&gt; # ℹ 6 more variables: hour_turn &lt;dbl&gt;, am_pm &lt;chr&gt;, x &lt;dbl&gt;, xend &lt;dbl&gt;,</span></span>
-<span><span class="co">#&gt; #   y &lt;dbl&gt;, yend &lt;dbl&gt;</span></span>
 <span></span>
-<span></span>
-<span><span class="va">statClockminhand</span> <span class="op">&lt;-</span> <span class="fu">ggproto</span><span class="op">(</span>`_class` <span class="op">=</span> <span class="st">"statClockminhand"</span>,</span>
+<span><span class="va">statClockminhand</span> <span class="op">&lt;-</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggproto.html" class="external-link">ggproto</a></span><span class="op">(</span>`_class` <span class="op">=</span> <span class="st">"statClockminhand"</span>,</span>
 <span>                          `_inherit` <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="va"><a href="https://ggplot2.tidyverse.org/reference/ggplot2-ggproto.html" class="external-link">Stat</a></span>,</span>
 <span>                          <span class="co"># required_aes = c("local_time"),</span></span>
 <span>                          compute_group <span class="op">=</span> <span class="va">compute_minute_hand</span>,</span>
@@ -665,15 +449,62 @@
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="va">statClockhourhand</span> <span class="op">&lt;-</span> <span class="fu">ggproto</span><span class="op">(</span>`_class` <span class="op">=</span> <span class="st">"statClockhourhand"</span>,</span>
+<span><span class="va">statClockhourhand</span> <span class="op">&lt;-</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggproto.html" class="external-link">ggproto</a></span><span class="op">(</span>`_class` <span class="op">=</span> <span class="st">"statClockhourhand"</span>,</span>
 <span>                          `_inherit` <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="va"><a href="https://ggplot2.tidyverse.org/reference/ggplot2-ggproto.html" class="external-link">Stat</a></span>,</span>
 <span>                          <span class="co"># required_aes = c("local_time"),</span></span>
 <span>                          compute_group <span class="op">=</span> <span class="va">compute_hour_hand</span>,</span>
 <span>                          default_aes <span class="op">=</span> <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span></span>
 <span>                                                            <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes_eval.html" class="external-link">after_stat</a></span><span class="op">(</span><span class="va">am_pm</span><span class="op">)</span><span class="op">)</span></span>
-<span>                           <span class="op">)</span></span>
-<span></span>
-<span><span class="va">geom_hour_hand</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
+<span>                           <span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb15"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">compute_clock_hands</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 15 × 9</span></span>
+<span><span class="co">#&gt;    tz       local_time_date_utc local_time local_date local_wday local_wday_date</span></span>
+<span><span class="co">#&gt;    &lt;chr&gt;    &lt;dttm&gt;              &lt;time&gt;     &lt;date&gt;     &lt;ord&gt;      &lt;chr&gt;          </span></span>
+<span><span class="co">#&gt;  1 US/Paci… 2024-03-27 11:00:00 11:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt;  2 US/Moun… 2024-03-27 12:00:00 12:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt;  3 US/Cent… 2024-03-27 13:00:00 13:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt;  4 US/East… 2024-03-27 14:00:00 14:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt;  5 America… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt;  6 America… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt;  7 America… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt;  8 Europe/… 2024-03-27 18:00:00 18:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt;  9 Europe/… 2024-03-27 19:00:00 19:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt; 10 Europe/… 2024-03-27 19:00:00 19:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt; 11 Europe/… 2024-03-27 19:00:00 19:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt; 12 Europe/… 2024-03-27 19:00:00 19:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt; 13 Austral… 2024-03-28 04:30:00 04:30      2024-03-28 Thu        Thu, Mar 28    </span></span>
+<span><span class="co">#&gt; 14 Austral… 2024-03-28 05:00:00 05:00      2024-03-28 Thu        Thu, Mar 28    </span></span>
+<span><span class="co">#&gt; 15 Austral… 2024-03-28 05:00:00 05:00      2024-03-28 Thu        Thu, Mar 28    </span></span>
+<span><span class="co">#&gt; # ℹ 3 more variables: minute_turn &lt;dbl&gt;, hour_turn &lt;dbl&gt;, am_pm &lt;chr&gt;</span></span>
+<span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu">compute_minute_hand</span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="co">#&gt; # A tibble: 15 × 13</span></span>
+<span><span class="co">#&gt;    tz       local_time_date_utc local_time local_date local_wday local_wday_date</span></span>
+<span><span class="co">#&gt;    &lt;chr&gt;    &lt;dttm&gt;              &lt;time&gt;     &lt;date&gt;     &lt;ord&gt;      &lt;chr&gt;          </span></span>
+<span><span class="co">#&gt;  1 US/Paci… 2024-03-27 11:00:00 11:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt;  2 US/Moun… 2024-03-27 12:00:00 12:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt;  3 US/Cent… 2024-03-27 13:00:00 13:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt;  4 US/East… 2024-03-27 14:00:00 14:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt;  5 America… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt;  6 America… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt;  7 America… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt;  8 Europe/… 2024-03-27 18:00:00 18:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt;  9 Europe/… 2024-03-27 19:00:00 19:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt; 10 Europe/… 2024-03-27 19:00:00 19:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt; 11 Europe/… 2024-03-27 19:00:00 19:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt; 12 Europe/… 2024-03-27 19:00:00 19:00      2024-03-27 Wed        Wed, Mar 27    </span></span>
+<span><span class="co">#&gt; 13 Austral… 2024-03-28 04:30:00 04:30      2024-03-28 Thu        Thu, Mar 28    </span></span>
+<span><span class="co">#&gt; 14 Austral… 2024-03-28 05:00:00 05:00      2024-03-28 Thu        Thu, Mar 28    </span></span>
+<span><span class="co">#&gt; 15 Austral… 2024-03-28 05:00:00 05:00      2024-03-28 Thu        Thu, Mar 28    </span></span>
+<span><span class="co">#&gt; # ℹ 7 more variables: minute_turn &lt;dbl&gt;, hour_turn &lt;dbl&gt;, am_pm &lt;chr&gt;, x &lt;dbl&gt;,</span></span>
+<span><span class="co">#&gt; #   xend &lt;dbl&gt;, y &lt;dbl&gt;, yend &lt;dbl&gt;</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="geom_clock_hands">
+<code>geom_clock_hands()</code><a class="anchor" aria-label="anchor" href="#geom_clock_hands"></a>
+</h3>
+<div class="sourceCode" id="cb16"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">geom_hour_hand</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span></span>
 <span>  <span class="va">mapping</span> <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">data</span> <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">position</span> <span class="op">=</span> <span class="st">"identity"</span>,</span>
@@ -692,36 +523,297 @@
 <span>  <span class="op">)</span></span>
 <span><span class="op">}</span></span>
 <span></span>
-<span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu">local_tzs_df_collapse</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span><span class="fu">gglobalclocks</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">aes</span><span class="op">(</span>local_time <span class="op">=</span> <span class="va">local_time</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">stamp_clockface</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_minute_hand</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">geom_hour_hand</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
-<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span><span class="va">locations</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `summarise()` has grouped output by 'local_time', 'local_date'. You can</span></span>
-<span><span class="co">#&gt; override using the `.groups` argument.</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-20-3.png" width="100%"></p>
-<div class="sourceCode" id="cb28"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span></span>
+<span></span>
 <span><span class="va">geom_clock_hands</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">...</span><span class="op">)</span><span class="op">{</span></span>
 <span>  </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span><span class="fu">geom_hour_hand</span><span class="op">(</span><span class="va">...</span><span class="op">)</span>,</span>
 <span>       <span class="fu">geom_minute_hand</span><span class="op">(</span><span class="va">...</span><span class="op">)</span><span class="op">)</span></span>
 <span>  </span>
-<span><span class="op">}</span></span>
-<span></span>
+<span><span class="op">}</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="try-it-out">Try it out<a class="anchor" aria-label="anchor" href="#try-it-out"></a>
+</h3>
+<div class="sourceCode" id="cb17"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu">local_tzs_df_collapse</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="fu">gglobalclocks</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>local_time <span class="op">=</span> <span class="va">local_time</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">stamp_clockface</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_minute_hand</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu">geom_hour_hand</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">locations</span><span class="op">)</span></span>
+<span><span class="co">#&gt; `summarise()` has grouped output by 'local_date', 'local_time'. You can</span></span>
+<span><span class="co">#&gt; override using the `.groups` argument.</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-10-1.png" width="100%"></p>
+<div class="sourceCode" id="cb18"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span></span>
 <span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">local_tzs_df_collapse</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu">gglobalclocks</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">aes</span><span class="op">(</span>local_time <span class="op">=</span> <span class="va">local_time</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>local_time <span class="op">=</span> <span class="va">local_time</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu">stamp_clockface</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
 <span>  <span class="fu">geom_clock_hands</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
-<span>  <span class="fu">facet_wrap</span><span class="op">(</span><span class="op">~</span><span class="va">locations</span><span class="op">)</span></span>
-<span><span class="co">#&gt; `summarise()` has grouped output by 'local_time', 'local_date'. You can</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/facet_wrap.html" class="external-link">facet_wrap</a></span><span class="op">(</span><span class="op">~</span><span class="va">locations</span><span class="op">)</span></span>
+<span><span class="co">#&gt; `summarise()` has grouped output by 'local_date', 'local_time'. You can</span></span>
 <span><span class="co">#&gt; override using the `.groups` argument.</span></span></code></pre></div>
-<p><img src="reference/figures/README-unnamed-chunk-20-4.png" width="100%"></p>
+<p><img src="reference/figures/README-unnamed-chunk-10-2.png" width="100%"></p>
+<div class="sourceCode" id="cb19"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">readme2pkg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readme2pkg/man/chunk_to_r.html" class="external-link">chunk_to_r</a></span><span class="op">(</span><span class="st">"gglobalclocks"</span><span class="op">)</span></span>
+<span><span class="fu">readme2pkg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readme2pkg/man/chunk_to_r.html" class="external-link">chunk_to_r</a></span><span class="op">(</span><span class="st">"stamp_clockface"</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu">readme2pkg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readme2pkg/man/chunk_to_r.html" class="external-link">chunk_to_r</a></span><span class="op">(</span><span class="st">"statClockhourhand"</span><span class="op">)</span></span>
+<span><span class="fu">readme2pkg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readme2pkg/man/chunk_to_r.html" class="external-link">chunk_to_r</a></span><span class="op">(</span><span class="st">"geom_clock_hands"</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="if-a-wall-of-clocks-is-unhelpful-in-scheduling-can-we-viz-in-a-different-way-towards-locationxlocatime-plot">If a wall of clocks is unhelpful in scheduling, can we viz in a different way? Towards LocationXLocaTime plot<a class="anchor" aria-label="anchor" href="#if-a-wall-of-clocks-is-unhelpful-in-scheduling-can-we-viz-in-a-different-way-towards-locationxlocatime-plot"></a>
+</h2>
+<div class="section level3">
+<h3 id="stamp_workday">
+<code>stamp_workday()</code><a class="anchor" aria-label="anchor" href="#stamp_workday"></a>
+</h3>
+<p>We’ll use an ‘stamp’ (annotation) layer that helps us get oriented to the 12 hours in a work day.</p>
+<div class="sourceCode" id="cb20"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">create_day_schedule_df</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="op">)</span><span class="op">{</span></span>
+<span>  </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/base/data.frame.html" class="external-link">data.frame</a></span><span class="op">(</span>time_start <span class="op">=</span> </span>
+<span>               <span class="fu">hms</span><span class="fu">::</span><span class="fu"><a href="https://hms.tidyverse.org/reference/hms.html" class="external-link">as_hms</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"00:00:00"</span>,<span class="st">"07:00:00"</span>, <span class="st">"09:00:00"</span>, <span class="st">"17:00:00"</span>,<span class="st">"21:00:00"</span><span class="op">)</span><span class="op">)</span>, </span>
+<span>             time_end <span class="op">=</span> </span>
+<span>               <span class="fu">hms</span><span class="fu">::</span><span class="fu"><a href="https://hms.tidyverse.org/reference/hms.html" class="external-link">as_hms</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"07:00:00"</span>,<span class="st">"09:00:00"</span>, <span class="st">"17:00:00"</span>, <span class="st">"21:00:00"</span>,<span class="st">"24:00:00"</span><span class="op">)</span><span class="op">)</span>,</span>
+<span>             stance <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"avoid"</span>,<span class="st">"awake"</span>, <span class="st">"business"</span>,<span class="st">"awake"</span>,<span class="st">"avoid"</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="op">}</span></span>
+<span></span>
+<span></span>
+<span><span class="va">stamp_workday</span> <span class="op">&lt;-</span> <span class="kw">function</span><span class="op">(</span><span class="va">show.legend</span> <span class="op">=</span> <span class="cn">T</span><span class="op">)</span><span class="op">{</span>  </span>
+<span>  </span>
+<span>  <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_tile.html" class="external-link">geom_rect</a></span><span class="op">(</span>data <span class="op">=</span> <span class="fu">create_day_schedule_df</span><span class="op">(</span><span class="op">)</span>,</span>
+<span>            <span class="fu">ggplot2</span><span class="fu">::</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>xmin <span class="op">=</span> <span class="va">time_start</span>,</span>
+<span>                xmax <span class="op">=</span> <span class="va">time_end</span>, </span>
+<span>                x <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>                fill <span class="op">=</span> <span class="va">stance</span>,</span>
+<span>                ymin <span class="op">=</span> <span class="op">-</span><span class="cn">Inf</span>,</span>
+<span>                ymax <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span>                y <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>                color <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span>,</span>
+<span>           alpha <span class="op">=</span> <span class="fl">.5</span>, show.legend <span class="op">=</span> <span class="va">show.legend</span><span class="op">)</span> </span>
+<span><span class="op">}</span></span></code></pre></div>
+<div class="sourceCode" id="cb21"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">readme2pkg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readme2pkg/man/chunk_to_r.html" class="external-link">chunk_to_r</a></span><span class="op">(</span>chunk_name <span class="op">=</span> <span class="st">"stamp_workday"</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="locationxlocaltime">LocationXLocalTime<a class="anchor" aria-label="anchor" href="#locationxlocaltime"></a>
+</h2>
+<div class="sourceCode" id="cb22"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu">local_tzs_df_collapse</span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span>  </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span><span class="va">local_time</span>, <span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_rev.html" class="external-link">fct_rev</a></span><span class="op">(</span><span class="fu"><a href="https://forcats.tidyverse.org/reference/fct_inorder.html" class="external-link">fct_inorder</a></span><span class="op">(</span><span class="fu"><a href="https://stringr.tidyverse.org/reference/str_wrap.html" class="external-link">str_wrap</a></span><span class="op">(</span><span class="va">locations</span>,<span class="fl">25</span><span class="op">)</span><span class="op">)</span><span class="op">)</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>x <span class="op">=</span> <span class="st">"Local meet time"</span>, y <span class="op">=</span> <span class="cn">NULL</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu">stamp_workday</span><span class="op">(</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_point.html" class="external-link">geom_point</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_text.html" class="external-link">geom_text</a></span><span class="op">(</span><span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>label <span class="op">=</span> <span class="va">local_time</span><span class="op">)</span>,</span>
+<span>            hjust <span class="op">=</span> <span class="op">-</span><span class="fl">.1</span>, show.legend <span class="op">=</span> <span class="cn">F</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/geom_abline.html" class="external-link">geom_vline</a></span><span class="op">(</span>xintercept <span class="op">=</span> <span class="fu">hms</span><span class="fu">::</span><span class="fu"><a href="https://hms.tidyverse.org/reference/hms.html" class="external-link">as_hms</a></span><span class="op">(</span><span class="st">"12:00:00"</span><span class="op">)</span>,</span>
+<span>              linetype <span class="op">=</span> <span class="st">"dashed"</span>, color <span class="op">=</span> <span class="st">"grey25"</span>,</span>
+<span>              alpha <span class="op">=</span> <span class="fl">.2</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/aes.html" class="external-link">aes</a></span><span class="op">(</span>color <span class="op">=</span> <span class="va">local_wday_date</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/labs.html" class="external-link">labs</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">"Local meet date"</span><span class="op">)</span> <span class="op">+</span></span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>legend.position <span class="op">=</span> <span class="st">"top"</span>, </span>
+<span>        legend.justification <span class="op">=</span> <span class="st">"left"</span><span class="op">)</span> <span class="op">+</span> </span>
+<span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/theme.html" class="external-link">theme</a></span><span class="op">(</span>panel.grid.major.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_blank</a></span><span class="op">(</span><span class="op">)</span>,</span>
+<span>        panel.grid.minor.y <span class="op">=</span> <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/element.html" class="external-link">element_line</a></span><span class="op">(</span>color <span class="op">=</span> <span class="st">""</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="co">#&gt; `summarise()` has grouped output by 'local_date', 'local_time'. You can</span></span>
+<span><span class="co">#&gt; override using the `.groups` argument.</span></span></code></pre></div>
+<p><img src="reference/figures/README-unnamed-chunk-13-1.png" width="100%"></p>
+</div>
+</div>
+<div class="section level1">
+<h1 id="part-ii-packaging-and-documentation-">Part II. Packaging and documentation 🚧<a class="anchor" aria-label="anchor" href="#part-ii-packaging-and-documentation-"></a>
+</h1>
+<div class="section level2">
+<h2 id="phase-1-minimal-working-package">Phase 1. Minimal working package<a class="anchor" aria-label="anchor" href="#phase-1-minimal-working-package"></a>
+</h2>
+<div class="section level3">
+<h3 id="bit-a-created-package-archetecture-running-devtoolscreate-in-interactive-session-">Bit A. Created package archetecture, running <code>devtools::create(".")</code> in interactive session. ✅<a class="anchor" aria-label="anchor" href="#bit-a-created-package-archetecture-running-devtoolscreate-in-interactive-session-"></a>
+</h3>
+<div class="sourceCode" id="cb23"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/create.html" class="external-link">create</a></span><span class="op">(</span><span class="st">"."</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="bit-b-added-roxygen-skeleton-">Bit B. Added roxygen skeleton? 🚧<a class="anchor" aria-label="anchor" href="#bit-b-added-roxygen-skeleton-"></a>
+</h3>
+<p>Use a roxygen skeleton for auto documentation and making sure proposed functions are <em>exported</em>. Generally, early on, I don’t do much (anything) in terms of filling in the skeleton for documentation, because things may change.</p>
+</div>
+<div class="section level3">
+<h3 id="bit-c-managed-dependencies--">Bit C. Managed dependencies ? 🚧<a class="anchor" aria-label="anchor" href="#bit-c-managed-dependencies--"></a>
+</h3>
+<p>Package dependencies managed, i.e. <code>depend::function()</code> in proposed functions and declared in the DESCRIPTION</p>
+<div class="sourceCode" id="cb24"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">usethis</span><span class="fu">::</span><span class="fu"><a href="https://usethis.r-lib.org/reference/use_package.html" class="external-link">use_package</a></span><span class="op">(</span><span class="st">"dplyr"</span><span class="op">)</span></span>
+<span><span class="fu">usethis</span><span class="fu">::</span><span class="fu"><a href="https://usethis.r-lib.org/reference/use_package.html" class="external-link">use_package</a></span><span class="op">(</span> <span class="st">"hms"</span><span class="op">)</span></span>
+<span><span class="fu">usethis</span><span class="fu">::</span><span class="fu"><a href="https://usethis.r-lib.org/reference/use_package.html" class="external-link">use_package</a></span><span class="op">(</span> <span class="st">"lubridate"</span><span class="op">)</span></span>
+<span><span class="fu">usethis</span><span class="fu">::</span><span class="fu"><a href="https://usethis.r-lib.org/reference/use_package.html" class="external-link">use_package</a></span><span class="op">(</span> <span class="st">"purrr"</span><span class="op">)</span></span>
+<span><span class="fu">usethis</span><span class="fu">::</span><span class="fu"><a href="https://usethis.r-lib.org/reference/use_package.html" class="external-link">use_package</a></span><span class="op">(</span> <span class="st">"tidyr"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="bit-d-moved-functions-r-folder-">Bit D. Moved functions R folder? ✅<a class="anchor" aria-label="anchor" href="#bit-d-moved-functions-r-folder-"></a>
+</h3>
+<p>Use new {readme2pkg} function to do this from readme…</p>
+<div class="sourceCode" id="cb25"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">readme2pkg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readme2pkg/man/chunk_to_r.html" class="external-link">chunk_to_r</a></span><span class="op">(</span><span class="st">"date_time_tz_to_tzs"</span><span class="op">)</span></span>
+<span><span class="fu">readme2pkg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readme2pkg/man/chunk_to_r.html" class="external-link">chunk_to_r</a></span><span class="op">(</span><span class="st">"local_tzs_df_collapse"</span><span class="op">)</span></span>
+<span><span class="fu">readme2pkg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readme2pkg/man/chunk_to_r.html" class="external-link">chunk_to_r</a></span><span class="op">(</span><span class="st">"time_to_local"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="bit-e-run-devtoolscheck-and-addressed-errors-">Bit E. Run <code>devtools::check()</code> and addressed errors. 🚧<a class="anchor" aria-label="anchor" href="#bit-e-run-devtoolscheck-and-addressed-errors-"></a>
+</h3>
+<div class="sourceCode" id="cb26"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">check</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="st">"."</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="bit-f-build-package--">Bit F. Build package 🚧 ✅<a class="anchor" aria-label="anchor" href="#bit-f-build-package--"></a>
+</h3>
+<div class="sourceCode" id="cb27"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/build.html" class="external-link">build</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="bit-g-write-traditional-readme-that-uses-built-package-also-serves-as-a-test-of-build-">Bit G. Write traditional README that uses built package (also serves as a test of build. ✅<a class="anchor" aria-label="anchor" href="#bit-g-write-traditional-readme-that-uses-built-package-also-serves-as-a-test-of-build-"></a>
+</h3>
+<p>The goal of the {ggchalkboard} package is to make it easy to theme ggplots like chalkboards</p>
+<p>Install package with:</p>
+<div class="sourceCode" id="cb28"><pre class="sourceCode R"><code class="sourceCode r"><span id="cb28-1"><a href="#cb28-1"></a>remotes<span class="op">::</span><span class="kw">install_github</span>(<span class="st">"EvaMaeRey/ggchalkboard"</span>)</span></code></pre></div>
+<p>Once functions are exported you can remove go to two colons, and when things are are really finalized, then go without colons (and rearrange your readme…)</p>
+<div class="sourceCode" id="cb29"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va">gglobalclocks</span><span class="op">)</span>  </span>
+<span></span>
+<span><span class="fu">gglobalclocks</span><span class="fu">:::</span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span><span class="st">"2024-03-06 11:00:00"</span>, </span>
+<span>                                    from_tz <span class="op">=</span> <span class="st">"US/Mountain"</span>,</span>
+<span>                                    to_tz <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"US/Eastern"</span>,</span>
+<span>                                              <span class="st">"US/Mountain"</span>,</span>
+<span>                                              <span class="st">"US/Pacific"</span>,</span>
+<span>                                              <span class="st">"Europe/Paris"</span><span class="op">)</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="bit-h-chosen-a-license-">Bit H. Chosen a license? ✅<a class="anchor" aria-label="anchor" href="#bit-h-chosen-a-license-"></a>
+</h3>
+<div class="sourceCode" id="cb30"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">usethis</span><span class="fu">::</span><span class="fu"><a href="https://usethis.r-lib.org/reference/licenses.html" class="external-link">use_mit_license</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="bit-i-add-lifecycle-badge-experimental-">Bit I. Add lifecycle badge (experimental) ✅<a class="anchor" aria-label="anchor" href="#bit-i-add-lifecycle-badge-experimental-"></a>
+</h3>
+<div class="sourceCode" id="cb31"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">usethis</span><span class="fu">::</span><span class="fu"><a href="https://usethis.r-lib.org/reference/badges.html" class="external-link">use_lifecycle_badge</a></span><span class="op">(</span><span class="st">"experimental"</span><span class="op">)</span></span></code></pre></div>
+</div>
+</div>
+<div class="section level2">
+<h2 id="phase-2-listen--iterate-">Phase 2: Listen &amp; iterate 🚧<a class="anchor" aria-label="anchor" href="#phase-2-listen--iterate-"></a>
+</h2>
+<p>Try to get feedback from experts on API, implementation, default decisions. Is there already work that solves this problem?</p>
+</div>
+<div class="section level2">
+<h2 id="phase-3-let-things-settle">Phase 3: Let things settle<a class="anchor" aria-label="anchor" href="#phase-3-let-things-settle"></a>
+</h2>
+<div class="section level3"><h3 id="bit-a-settle-on-examples-put-them-in-the-roxygen-skeleton-and-readme-">Bit A. Settle on examples. Put them in the roxygen skeleton and readme. 🚧<a class="anchor" aria-label="anchor" href="#bit-a-settle-on-examples-put-them-in-the-roxygen-skeleton-and-readme-"></a>
+</h3></div>
+<div class="section level3">
+<h3 id="bit-b-written-formal-tests-of-functions-and-save-to-test-that-folders-">Bit B. Written formal tests of functions and save to test that folders 🚧<a class="anchor" aria-label="anchor" href="#bit-b-written-formal-tests-of-functions-and-save-to-test-that-folders-"></a>
+</h3>
+<p>That would look like this…</p>
+<div class="sourceCode" id="cb32"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://testthat.r-lib.org" class="external-link">testthat</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://testthat.r-lib.org/reference/test_that.html" class="external-link">test_that</a></span><span class="op">(</span><span class="st">"calc times 2 works"</span>, <span class="op">{</span></span>
+<span>  <span class="fu"><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">expect_equal</a></span><span class="op">(</span><span class="fu">times_two</span><span class="op">(</span><span class="fl">4</span><span class="op">)</span>, <span class="fl">8</span><span class="op">)</span></span>
+<span>  <span class="fu"><a href="https://testthat.r-lib.org/reference/equality-expectations.html" class="external-link">expect_equal</a></span><span class="op">(</span><span class="fu">times_two</span><span class="op">(</span><span class="fl">5</span><span class="op">)</span>, <span class="fl">10</span><span class="op">)</span></span>
+<span>  </span>
+<span><span class="op">}</span><span class="op">)</span></span></code></pre></div>
+<div class="sourceCode" id="cb33"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">readme2pkg</span><span class="fu">::</span><span class="fu"><a href="https://rdrr.io/pkg/readme2pkg/man/chunk_to_tests_testthat.html" class="external-link">chunk_to_tests_testthat</a></span><span class="op">(</span><span class="st">"test_calc_times_two_works"</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3"><h3 id="bit-c-added-a-description-and-author-information-in-the-description-file-">Bit C. Added a description and author information in the DESCRIPTION file 🚧<a class="anchor" aria-label="anchor" href="#bit-c-added-a-description-and-author-information-in-the-description-file-"></a>
+</h3></div>
+<div class="section level3"><h3 id="bit-d-addressed-all-notes-warnings-and-errors-">Bit D. Addressed <em>all</em> notes, warnings and errors. 🚧<a class="anchor" aria-label="anchor" href="#bit-d-addressed-all-notes-warnings-and-errors-"></a>
+</h3></div>
+</div>
+<div class="section level2">
+<h2 id="phase-4-promote-to-wider-audience">Phase 4. Promote to wider audience…<a class="anchor" aria-label="anchor" href="#phase-4-promote-to-wider-audience"></a>
+</h2>
+<div class="section level3">
+<h3 id="bit-a-package-website-built-">Bit A. Package website built? ✅<a class="anchor" aria-label="anchor" href="#bit-a-package-website-built-"></a>
+</h3>
+<div class="sourceCode" id="cb34"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">usethis</span><span class="fu">::</span><span class="fu"><a href="https://usethis.r-lib.org/reference/use_pkgdown.html" class="external-link">use_pkgdown</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="fu">pkgdown</span><span class="fu">::</span><span class="fu"><a href="https://pkgdown.r-lib.org/reference/build_site.html" class="external-link">build_site</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3"><h3 id="bit-b-package-website-deployed--">Bit B. Package website deployed? 🚧 ✅<a class="anchor" aria-label="anchor" href="#bit-b-package-website-deployed--"></a>
+</h3></div>
+</div>
+<div class="section level2">
+<h2 id="phase-5-hardencommit">Phase 5: Harden/commit<a class="anchor" aria-label="anchor" href="#phase-5-hardencommit"></a>
+</h2>
+<div class="section level3"><h3 id="submit-to-cranruniverse-">Submit to CRAN/RUniverse? 🚧<a class="anchor" aria-label="anchor" href="#submit-to-cranruniverse-"></a>
+</h3></div>
+</div>
+</div>
+<div class="section level1">
+<h1 id="appendix-reports-environment">Appendix: Reports, Environment<a class="anchor" aria-label="anchor" href="#appendix-reports-environment"></a>
+</h1>
+<div class="section level2">
+<h2 id="edit-description-file">Edit Description file<a class="anchor" aria-label="anchor" href="#edit-description-file"></a>
+</h2>
+<div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span><span class="st">"DESCRIPTION"</span><span class="op">)</span></span>
+<span><span class="co">#&gt;  [1] "Package: gglobalclocks"                             </span></span>
+<span><span class="co">#&gt;  [2] "Title: What the Package Does (One Line, Title Case)"</span></span>
+<span><span class="co">#&gt;  [3] "Version: 0.0.0.9000"                                </span></span>
+<span><span class="co">#&gt;  [4] "Authors@R: "                                        </span></span>
+<span><span class="co">#&gt;  [5] "    person(given = \"First\","                      </span></span>
+<span><span class="co">#&gt;  [6] "           family = \"Last\","                      </span></span>
+<span><span class="co">#&gt;  [7] "           role = c(\"aut\", \"cre\"),"             </span></span>
+<span><span class="co">#&gt;  [8] "           email = \"first.last@example.com\","     </span></span>
+<span><span class="co">#&gt;  [9] "           comment = c(ORCID = \"YOUR-ORCID-ID\"))" </span></span>
+<span><span class="co">#&gt; [10] "Description: What the package does (one paragraph)."</span></span>
+<span><span class="co">#&gt; [11] "License: MIT + file LICENSE"                        </span></span>
+<span><span class="co">#&gt; [12] "Encoding: UTF-8"                                    </span></span>
+<span><span class="co">#&gt; [13] "LazyData: true"                                     </span></span>
+<span><span class="co">#&gt; [14] "Roxygen: list(markdown = TRUE)"                     </span></span>
+<span><span class="co">#&gt; [15] "RoxygenNote: 7.1.1"                                 </span></span>
+<span><span class="co">#&gt; [16] "Imports: "                                          </span></span>
+<span><span class="co">#&gt; [17] "    dplyr,"                                         </span></span>
+<span><span class="co">#&gt; [18] "    hms,"                                           </span></span>
+<span><span class="co">#&gt; [19] "    lubridate,"                                     </span></span>
+<span><span class="co">#&gt; [20] "    purrr,"                                         </span></span>
+<span><span class="co">#&gt; [21] "    tidyr"</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="environment">Environment<a class="anchor" aria-label="anchor" href="#environment"></a>
+</h2>
+<p>Here I just want to print the packages and the versions</p>
+<div class="sourceCode" id="cb36"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">all</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/utils/sessionInfo.html" class="external-link">sessionInfo</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/base/print.html" class="external-link">print</a></span><span class="op">(</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/utils/capture.output.html" class="external-link">capture.output</a></span><span class="op">(</span><span class="op">)</span></span>
+<span><span class="va">all</span><span class="op">[</span><span class="fl">11</span><span class="op">:</span><span class="fl">20</span><span class="op">]</span></span>
+<span><span class="co">#&gt;  [1] ""                                                                         </span></span>
+<span><span class="co">#&gt;  [2] "attached base packages:"                                                  </span></span>
+<span><span class="co">#&gt;  [3] "[1] stats     graphics  grDevices utils     datasets  methods   base     "</span></span>
+<span><span class="co">#&gt;  [4] ""                                                                         </span></span>
+<span><span class="co">#&gt;  [5] "other attached packages:"                                                 </span></span>
+<span><span class="co">#&gt;  [6] " [1] lubridate_1.9.2      forcats_1.0.0        stringr_1.5.0       "      </span></span>
+<span><span class="co">#&gt;  [7] " [4] dplyr_1.1.0          purrr_1.0.1          readr_2.1.4         "      </span></span>
+<span><span class="co">#&gt;  [8] " [7] tidyr_1.3.0          tibble_3.2.1         ggplot2_3.4.4.9000  "      </span></span>
+<span><span class="co">#&gt;  [9] "[10] tidyverse_2.0.0.9000"                                                </span></span>
+<span><span class="co">#&gt; [10] ""</span></span></code></pre></div>
+</div>
+<div class="section level2">
+<h2 id="devtoolscheck-report">
+<code>devtools::check()</code> report<a class="anchor" aria-label="anchor" href="#devtoolscheck-report"></a>
+</h2>
+<div class="sourceCode" id="cb37"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu">devtools</span><span class="fu">::</span><span class="fu"><a href="https://devtools.r-lib.org/reference/check.html" class="external-link">check</a></span><span class="op">(</span>pkg <span class="op">=</span> <span class="st">"."</span><span class="op">)</span></span></code></pre></div>
+<p>What would gglobalclocks syntax look like using above approach as jumping off point?</p>
+</div>
 </div>
 
   </div>

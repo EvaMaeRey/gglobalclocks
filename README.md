@@ -36,42 +36,43 @@ gglobalclocks:::date_time_tz_to_tzs() |>
 
 ``` r
   
-gglobalclocks:::date_time_tz_to_tzs() |> 
-  head()
-#> # A tibble: 6 × 6
-#>   tz        local_time_date_utc local_time local_date local_wday local_wday_date
-#>   <chr>     <dttm>              <time>     <date>     <ord>      <chr>          
-#> 1 US/Pacif… 2024-03-27 11:00:00 11:00      2024-03-27 Wed        Wed, Mar 27    
-#> 2 US/Mount… 2024-03-27 12:00:00 12:00      2024-03-27 Wed        Wed, Mar 27    
-#> 3 US/Centr… 2024-03-27 13:00:00 13:00      2024-03-27 Wed        Wed, Mar 27    
-#> 4 US/Easte… 2024-03-27 14:00:00 14:00      2024-03-27 Wed        Wed, Mar 27    
-#> 5 America/… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27    
-#> 6 America/… 2024-03-27 15:00:00 15:00      2024-03-27 Wed        Wed, Mar 27
-
-gglobalclocks:::date_time_tz_to_tzs() |> 
-  gglobalclocks:::local_tzs_df_collapse()
-#> # A tibble: 9 × 3
-#>   locations                           local_time local_wday_date
-#>   <chr>                               <time>     <chr>          
-#> 1 Adelaide                            04:30      Thu, Mar 28    
-#> 2 Melbourne; Sydney                   05:00      Thu, Mar 28    
-#> 3 US/Pacific                          11:00      Wed, Mar 27    
-#> 4 US/Mountain                         12:00      Wed, Mar 27    
-#> 5 US/Central                          13:00      Wed, Mar 27    
-#> 6 US/Eastern                          14:00      Wed, Mar 27    
-#> 7 Buenos_Aires; Santiago; Sao_Paulo   15:00      Wed, Mar 27    
-#> 8 London                              18:00      Wed, Mar 27    
-#> 9 Amsterdam; Paris; Stockholm; Vienna 19:00      Wed, Mar 27
+tz_targets <- c("US/Mountain","US/Eastern","US/Eastern", "Europe/Paris", "Europe/Amsterdam", "America/Sao_Paulo", "America/Santiago", "Australia/Melbourne")
 
 gglobalclocks:::date_time_tz_to_tzs(
   from_date_time = "2024-03-06 12:00:00",
   from_tz = "US/Mountain",
-  to_tz = c("US/Mountain", "Europe/Paris", "America/Sao_Paulo")
-  ) |> 
-  gglobalclocks:::local_tzs_df_collapse() |>  
+  to_tz = tz_targets)
+#> # A tibble: 7 × 6
+#>   tz        local_time_date_utc local_time local_date local_wday local_wday_date
+#>   <chr>     <dttm>              <time>     <date>     <ord>      <chr>          
+#> 1 US/Mount… 2024-03-06 12:00:00 12:00      2024-03-06 Wed        Wed, Mar 6     
+#> 2 US/Easte… 2024-03-06 14:00:00 14:00      2024-03-06 Wed        Wed, Mar 6     
+#> 3 America/… 2024-03-06 16:00:00 16:00      2024-03-06 Wed        Wed, Mar 6     
+#> 4 America/… 2024-03-06 16:00:00 16:00      2024-03-06 Wed        Wed, Mar 6     
+#> 5 Europe/A… 2024-03-06 20:00:00 20:00      2024-03-06 Wed        Wed, Mar 6     
+#> 6 Europe/P… 2024-03-06 20:00:00 20:00      2024-03-06 Wed        Wed, Mar 6     
+#> 7 Australi… 2024-03-07 06:00:00 06:00      2024-03-07 Thu        Thu, Mar 7
+
+df <- gglobalclocks:::date_time_tz_to_tzs(
+  from_date_time = "2024-03-06 12:00:00",
+  from_tz = "US/Mountain",
+  to_tz = tz_targets) |> 
+  gglobalclocks:::local_tzs_df_collapse()
+
+df
+#> # A tibble: 5 × 4
+#>   locations           local_time local_wday_date location           
+#>   <chr>               <time>     <chr>           <fct>              
+#> 1 US/Mountain         12:00      Wed, Mar 6      US/Mountain        
+#> 2 US/Eastern          14:00      Wed, Mar 6      US/Eastern         
+#> 3 Santiago; Sao_Paulo 16:00      Wed, Mar 6      Santiago; Sao_Paulo
+#> 4 Amsterdam; Paris    20:00      Wed, Mar 6      Amsterdam; Paris   
+#> 5 Melbourne           06:00      Thu, Mar 7      Melbourne
+
+df |>  
   ggplot() + 
   gglobalclocks:::stamp_workday() +
-  aes(local_time, locations) + 
+  aes(local_time, fct_inorder(locations)) + 
   geom_point() +
   geom_text(aes(label = local_time)) + 
   aes(color = local_wday_date)
@@ -173,11 +174,14 @@ time, you can collapse these locations by local time.
 local_tzs_df_collapse <- function(local_tzs_df, collapse = "; "){
   
   local_tzs_df |>
-    group_by(local_time, local_wday_date) |>
+    group_by(local_date, local_time, local_wday_date) |>
     summarise(locations = paste(tz, collapse = collapse)) |>
     ungroup() |>
     select(locations, everything()) |>
-    mutate(locations = str_remove_all(locations, "Europe/|America/|Australia/"))
+    mutate(locations = str_remove_all(locations, "Europe/|America/|Australia/")) |>
+    arrange(local_date, local_time) |>
+    mutate(location = fct_inorder(locations)) |>
+    select(-local_date)
   
 }
 ```
@@ -189,17 +193,17 @@ they can know, at a glance, their likelihood of making attending work.
 date_time_tz_to_tzs() |> 
   local_tzs_df_collapse() |> 
   head()
-#> `summarise()` has grouped output by 'local_time'. You can override using the
-#> `.groups` argument.
-#> # A tibble: 6 × 3
-#>   locations         local_time local_wday_date
-#>   <chr>             <time>     <chr>          
-#> 1 Adelaide          04:30      Thu, Mar 28    
-#> 2 Melbourne; Sydney 05:00      Thu, Mar 28    
-#> 3 US/Pacific        11:00      Wed, Mar 27    
-#> 4 US/Mountain       12:00      Wed, Mar 27    
-#> 5 US/Central        13:00      Wed, Mar 27    
-#> 6 US/Eastern        14:00      Wed, Mar 27
+#> `summarise()` has grouped output by 'local_date', 'local_time'. You can
+#> override using the `.groups` argument.
+#> # A tibble: 6 × 4
+#>   locations                         local_time local_wday_date location         
+#>   <chr>                             <time>     <chr>           <fct>            
+#> 1 US/Pacific                        11:00      Wed, Mar 27     US/Pacific       
+#> 2 US/Mountain                       12:00      Wed, Mar 27     US/Mountain      
+#> 3 US/Central                        13:00      Wed, Mar 27     US/Central       
+#> 4 US/Eastern                        14:00      Wed, Mar 27     US/Eastern       
+#> 5 Buenos_Aires; Santiago; Sao_Paulo 15:00      Wed, Mar 27     Buenos_Aires; Sa…
+#> 6 London                            18:00      Wed, Mar 27     London
 ```
 
 # More charming display…
@@ -211,21 +215,21 @@ for example.
 date_time_tz_to_tzs() |> 
   local_tzs_df_collapse() |> 
   knitr::kable()
-#> `summarise()` has grouped output by 'local_time'. You can override using the
-#> `.groups` argument.
+#> `summarise()` has grouped output by 'local_date', 'local_time'. You can
+#> override using the `.groups` argument.
 ```
 
-| locations                           | local\_time | local\_wday\_date |
-| :---------------------------------- | :---------- | :---------------- |
-| Adelaide                            | 04:30:00    | Thu, Mar 28       |
-| Melbourne; Sydney                   | 05:00:00    | Thu, Mar 28       |
-| US/Pacific                          | 11:00:00    | Wed, Mar 27       |
-| US/Mountain                         | 12:00:00    | Wed, Mar 27       |
-| US/Central                          | 13:00:00    | Wed, Mar 27       |
-| US/Eastern                          | 14:00:00    | Wed, Mar 27       |
-| Buenos\_Aires; Santiago; Sao\_Paulo | 15:00:00    | Wed, Mar 27       |
-| London                              | 18:00:00    | Wed, Mar 27       |
-| Amsterdam; Paris; Stockholm; Vienna | 19:00:00    | Wed, Mar 27       |
+| locations                           | local\_time | local\_wday\_date | location                            |
+| :---------------------------------- | :---------- | :---------------- | :---------------------------------- |
+| US/Pacific                          | 11:00:00    | Wed, Mar 27       | US/Pacific                          |
+| US/Mountain                         | 12:00:00    | Wed, Mar 27       | US/Mountain                         |
+| US/Central                          | 13:00:00    | Wed, Mar 27       | US/Central                          |
+| US/Eastern                          | 14:00:00    | Wed, Mar 27       | US/Eastern                          |
+| Buenos\_Aires; Santiago; Sao\_Paulo | 15:00:00    | Wed, Mar 27       | Buenos\_Aires; Santiago; Sao\_Paulo |
+| London                              | 18:00:00    | Wed, Mar 27       | London                              |
+| Amsterdam; Paris; Stockholm; Vienna | 19:00:00    | Wed, Mar 27       | Amsterdam; Paris; Stockholm; Vienna |
+| Adelaide                            | 04:30:00    | Thu, Mar 28       | Adelaide                            |
+| Melbourne; Sydney                   | 05:00:00    | Thu, Mar 28       | Melbourne; Sydney                   |
 
 ### Let’s build a wall of global clocks with base ggplot2
 
@@ -257,8 +261,8 @@ date_time_tz_to_tzs() |>
             show.legend = F) + 
   theme_void() + 
   annotate(geom = "segment", x = 0, xend = 1, y = 1.2, yend = 1.2)
-#> `summarise()` has grouped output by 'local_time'. You can override using the
-#> `.groups` argument.
+#> `summarise()` has grouped output by 'local_date', 'local_time'. You can
+#> override using the `.groups` argument.
 ```
 
 <img src="man/figures/README-unnamed-chunk-7-1.png" width="100%" />
@@ -310,7 +314,7 @@ compute_clock_hands <- function(data){
   
   data |> 
   dplyr::mutate(minute_turn = local_time %>% lubridate::minute() %% 60 / 60) |> 
-  dplyr::mutate(hour_turn = local_time %>% lubridate::hour() %% 12/12 + minute_turn/12) |>  
+  dplyr::mutate(hour_turn = local_time %>% lubridate::hour() %% 12/12 + minute_turn/12) |>
   dplyr::mutate(am_pm = ifelse(local_time %>% lubridate::hour() > 12, "pm", "am")) 
   
 }
@@ -461,14 +465,13 @@ gglobalclocks() +
   geom_minute_hand() +
   geom_hour_hand() +
   facet_wrap(~locations)
-#> `summarise()` has grouped output by 'local_time'. You can override using the
-#> `.groups` argument.
+#> `summarise()` has grouped output by 'local_date', 'local_time'. You can
+#> override using the `.groups` argument.
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-1.png" width="100%" />
 
 ``` r
-
 
 date_time_tz_to_tzs() |> 
   local_tzs_df_collapse() |>
@@ -477,8 +480,8 @@ date_time_tz_to_tzs() |>
   stamp_clockface() + 
   geom_clock_hands() + 
   facet_wrap(~locations)
-#> `summarise()` has grouped output by 'local_time'. You can override using the
-#> `.groups` argument.
+#> `summarise()` has grouped output by 'local_date', 'local_time'. You can
+#> override using the `.groups` argument.
 ```
 
 <img src="man/figures/README-unnamed-chunk-10-2.png" width="100%" />
@@ -502,10 +505,10 @@ the 12 hours in a work day.
 create_day_schedule_df <- function(){
   
   data.frame(time_start = 
-                                hms::as_hms(c("00:00:00","07:00:00", "09:00:00", "17:00:00","21:00:00")), 
-                              time_end = 
-                                hms::as_hms(c("07:00:00","09:00:00", "17:00:00", "21:00:00","24:00:00")),
-                              stance = c("avoid","awake", "business","awake","avoid"))
+               hms::as_hms(c("00:00:00","07:00:00", "09:00:00", "17:00:00","21:00:00")), 
+             time_end = 
+               hms::as_hms(c("07:00:00","09:00:00", "17:00:00", "21:00:00","24:00:00")),
+             stance = c("avoid","awake", "business","awake","avoid"))
 }
 
 
@@ -534,7 +537,7 @@ readme2pkg::chunk_to_r(chunk_name = "stamp_workday")
 date_time_tz_to_tzs() |> 
   local_tzs_df_collapse() |>  
   ggplot() + 
-  aes(local_time, fct_inorder(str_wrap(locations,25))) + 
+  aes(local_time, fct_rev(fct_inorder(str_wrap(locations,25)))) + 
   labs(x = "Local meet time", y = NULL) + 
   stamp_workday() +
   geom_point() + 
@@ -549,8 +552,8 @@ date_time_tz_to_tzs() |>
         legend.justification = "left") + 
   theme(panel.grid.major.y = element_blank(),
         panel.grid.minor.y = element_line(color = ""))
-#> `summarise()` has grouped output by 'local_time'. You can override using the
-#> `.groups` argument.
+#> `summarise()` has grouped output by 'local_date', 'local_time'. You can
+#> override using the `.groups` argument.
 ```
 
 <img src="man/figures/README-unnamed-chunk-13-1.png" width="100%" />

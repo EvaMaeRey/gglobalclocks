@@ -37,21 +37,25 @@ gglobalclocks:::date_time_tz_to_tzs() |>
     gglobalclocks:::geom_clock_hands() + 
     facet_wrap(~str_wrap(locations, 20))
   
-gglobalclocks:::date_time_tz_to_tzs() |> 
-  head()
-
-gglobalclocks:::date_time_tz_to_tzs() |> 
-  gglobalclocks:::local_tzs_df_collapse()
+tz_targets <- c("US/Mountain","US/Eastern","US/Eastern", "Europe/Paris", "Europe/Amsterdam", "America/Sao_Paulo", "America/Santiago", "Australia/Melbourne")
 
 gglobalclocks:::date_time_tz_to_tzs(
   from_date_time = "2024-03-06 12:00:00",
   from_tz = "US/Mountain",
-  to_tz = c("US/Mountain", "Europe/Paris", "America/Sao_Paulo")
-  ) |> 
-  gglobalclocks:::local_tzs_df_collapse() |>  
+  to_tz = tz_targets)
+
+df <- gglobalclocks:::date_time_tz_to_tzs(
+  from_date_time = "2024-03-06 12:00:00",
+  from_tz = "US/Mountain",
+  to_tz = tz_targets) |> 
+  gglobalclocks:::local_tzs_df_collapse()
+
+df
+
+df |>  
   ggplot() + 
   gglobalclocks:::stamp_workday() +
-  aes(local_time, locations) + 
+  aes(local_time, fct_inorder(locations)) + 
   geom_point() +
   geom_text(aes(label = local_time)) + 
   aes(color = local_wday_date)
@@ -137,11 +141,14 @@ If it turns out that you have multiple tz with the same local meeting time, you 
 local_tzs_df_collapse <- function(local_tzs_df, collapse = "; "){
   
   local_tzs_df |>
-    group_by(local_time, local_wday_date) |>
+    group_by(local_date, local_time, local_wday_date) |>
     summarise(locations = paste(tz, collapse = collapse)) |>
     ungroup() |>
     select(locations, everything()) |>
-    mutate(locations = str_remove_all(locations, "Europe/|America/|Australia/"))
+    mutate(locations = str_remove_all(locations, "Europe/|America/|Australia/")) |>
+    arrange(local_date, local_time) |>
+    mutate(location = fct_inorder(locations)) |>
+    select(-local_date)
   
 }
 ```
@@ -244,7 +251,7 @@ compute_clock_hands <- function(data){
   
   data |> 
   dplyr::mutate(minute_turn = local_time %>% lubridate::minute() %% 60 / 60) |> 
-  dplyr::mutate(hour_turn = local_time %>% lubridate::hour() %% 12/12 + minute_turn/12) |>  
+  dplyr::mutate(hour_turn = local_time %>% lubridate::hour() %% 12/12 + minute_turn/12) |>
   dplyr::mutate(am_pm = ifelse(local_time %>% lubridate::hour() > 12, "pm", "am")) 
   
 }
@@ -357,7 +364,6 @@ gglobalclocks() +
   geom_hour_hand() +
   facet_wrap(~locations)
 
-
 date_time_tz_to_tzs() |> 
   local_tzs_df_collapse() |>
   gglobalclocks() + 
@@ -386,10 +392,10 @@ We'll use an 'stamp' (annotation) layer that helps us get oriented to the 12 hou
 create_day_schedule_df <- function(){
   
   data.frame(time_start = 
-                                hms::as_hms(c("00:00:00","07:00:00", "09:00:00", "17:00:00","21:00:00")), 
-                              time_end = 
-                                hms::as_hms(c("07:00:00","09:00:00", "17:00:00", "21:00:00","24:00:00")),
-                              stance = c("avoid","awake", "business","awake","avoid"))
+               hms::as_hms(c("00:00:00","07:00:00", "09:00:00", "17:00:00","21:00:00")), 
+             time_end = 
+               hms::as_hms(c("07:00:00","09:00:00", "17:00:00", "21:00:00","24:00:00")),
+             stance = c("avoid","awake", "business","awake","avoid"))
 }
 
 
@@ -418,7 +424,7 @@ readme2pkg::chunk_to_r(chunk_name = "stamp_workday")
 date_time_tz_to_tzs() |> 
   local_tzs_df_collapse() |>  
   ggplot() + 
-  aes(local_time, fct_inorder(str_wrap(locations,25))) + 
+  aes(local_time, fct_rev(fct_inorder(str_wrap(locations,25)))) + 
   labs(x = "Local meet time", y = NULL) + 
   stamp_workday() +
   geom_point() + 

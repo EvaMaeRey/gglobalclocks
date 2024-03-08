@@ -1,10 +1,10 @@
 create_day_schedule_df <- function(){
   
   data.frame(time_start = 
-                                hms::as_hms(c("00:00:00","07:00:00", "09:00:00", "17:00:00","21:00:00")), 
-                              time_end = 
-                                hms::as_hms(c("07:00:00","09:00:00", "17:00:00", "21:00:00","24:00:00")),
-                              stance = c("avoid","awake", "business","awake","avoid"))
+               hms::as_hms(c("00:00:00","07:00:00", "09:00:00", "17:00:00","21:00:00")), 
+             time_end = 
+               hms::as_hms(c("07:00:00","09:00:00", "17:00:00", "21:00:00","24:00:00")),
+             stance = c("avoid","awake", "business","awake","avoid"))
 }
 
 
