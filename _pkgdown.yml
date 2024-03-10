@@ -2,7 +2,7 @@ template:
   bootstrap: 5
   bootswatch: simplex
   bslib:
-    primary: "#382673"
+    primary: "#3c328f"
     base_font: {google: "Atkinson Hyperlegible"}
     heading_font: {google: "Atkinson Hyperlegible"}
     text-muted: "#FFFFFF"
