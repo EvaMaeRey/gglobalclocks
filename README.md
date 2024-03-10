@@ -13,9 +13,9 @@ What if you could draw a beautiful ‘wall’ of clocks with local times
 from around the world? Well, gglobalclocks lets you do that\!
 
 I worked on the wall of clocks thinking it might help me schedule
-virtual meetings with participant from around the world. Does a
-beautiful wall of clocks help schedule global meetings? As it turns out,
-in my experience, not really\!
+virtual meetings with participant in lots of different time zones. Does
+a beautiful wall of clocks help schedule global meetings? As it turns
+out, in my experience, not really\!
 
 But gglobalclocks also has utilities for building dataframes of
 locations and local times which I have found helpful for multi-timezone
@@ -698,26 +698,26 @@ pkgdown::build_site()
 
 ``` r
 readLines("DESCRIPTION")
-#>  [1] "Package: gglobalclocks"                             
-#>  [2] "Title: What the Package Does (One Line, Title Case)"
-#>  [3] "Version: 0.0.0.9000"                                
-#>  [4] "Authors@R: "                                        
-#>  [5] "    person(given = \"First\","                      
-#>  [6] "           family = \"Last\","                      
-#>  [7] "           role = c(\"aut\", \"cre\"),"             
-#>  [8] "           email = \"first.last@example.com\","     
-#>  [9] "           comment = c(ORCID = \"YOUR-ORCID-ID\"))" 
-#> [10] "Description: What the package does (one paragraph)."
-#> [11] "License: MIT + file LICENSE"                        
-#> [12] "Encoding: UTF-8"                                    
-#> [13] "LazyData: true"                                     
-#> [14] "Roxygen: list(markdown = TRUE)"                     
-#> [15] "RoxygenNote: 7.1.1"                                 
-#> [16] "Imports: "                                          
-#> [17] "    dplyr,"                                         
-#> [18] "    hms,"                                           
-#> [19] "    lubridate,"                                     
-#> [20] "    purrr,"                                         
+#>  [1] "Package: gglobalclocks"                                                           
+#>  [2] "Title: Create a Wall of Clocks with the Local Time for Locations Around the World"
+#>  [3] "Version: 0.0.0.9000"                                                              
+#>  [4] "Authors@R: "                                                                      
+#>  [5] "    person(given = \"Gina\","                                                     
+#>  [6] "           family = \"Reynolds\","                                                
+#>  [7] "           role = c(\"aut\", \"cre\"),"                                           
+#>  [8] "           email = \"first.last@example.com\","                                   
+#>  [9] "           comment = c(ORCID = \"YOUR-ORCID-ID\"))"                               
+#> [10] "Description: What the package does (one paragraph)."                              
+#> [11] "License: MIT + file LICENSE"                                                      
+#> [12] "Encoding: UTF-8"                                                                  
+#> [13] "LazyData: true"                                                                   
+#> [14] "Roxygen: list(markdown = TRUE)"                                                   
+#> [15] "RoxygenNote: 7.1.1"                                                               
+#> [16] "Imports: "                                                                        
+#> [17] "    dplyr,"                                                                       
+#> [18] "    hms,"                                                                         
+#> [19] "    lubridate,"                                                                   
+#> [20] "    purrr,"                                                                       
 #> [21] "    tidyr"
 ```
 

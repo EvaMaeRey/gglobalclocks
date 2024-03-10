@@ -1,9 +1,9 @@
 Package: gglobalclocks
-Title: What the Package Does (One Line, Title Case)
+Title: Create a Wall of Clocks with the Local Time for Locations Around the World
 Version: 0.0.0.9000
 Authors@R: 
-    person(given = "First",
-           family = "Last",
+    person(given = "Gina",
+           family = "Reynolds",
            role = c("aut", "cre"),
            email = "first.last@example.com",
            comment = c(ORCID = "YOUR-ORCID-ID"))

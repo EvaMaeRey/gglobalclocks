@@ -1,0 +1,53 @@
+template:
+  bootstrap: 5
+  bootswatch: simplex
+  bslib:
+    primary: "#382673"
+    base_font: {google: "Atkinson Hyperlegible"}
+    heading_font: {google: "Atkinson Hyperlegible"}
+    text-muted: "#FFFFFF"
+
+development:
+  mode: auto
+
+home:
+  strip_header: false
+
+# navbar:
+#   bg: primary
+#   title: "Evangeline Reynolds, PhD"
+#   # type: inverse
+#   structure:
+#     left:
+#     - home
+#     right:
+#     - github
+
+
+navbar:
+  bg: primary
+  structure:
+    left:  [intro, reference, tutorials, news]
+    right: [search, github]
+  left:
+    - icon: fa-home
+      href: index.html
+    - text: Reference
+      href: reference/index.html
+    # - text: Gallery
+    #   href: articles/gallery.html
+    # - text: Articles
+    #   menu:
+    #   - text: "Themes"
+    #     href: articles/themes.html
+    # - text: News
+    #   href: news/index.html
+
+  components:
+    github:
+      icon: fab fa-github fa-lg
+      href: https://github.com/EvaMaeRey/gglobalclocks/
+
+authors:
+  "Evangeline Reynolds":
+    href: https://evamaerey.github.io/io/
