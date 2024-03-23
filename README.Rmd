@@ -37,16 +37,16 @@ gglobalclocks:::date_time_tz_to_tzs() |>
     gglobalclocks:::geom_clock_hands() + 
     facet_wrap(~str_wrap(locations, 20))
   
-tz_targets <- c("US/Mountain","US/Eastern","US/Eastern", "Europe/Paris", "Europe/Amsterdam", "America/Sao_Paulo", "America/Santiago", "Australia/Melbourne")
+tz_targets <- c("US/Mountain","US/Eastern","US/Pacific", "Europe/Paris", "Europe/Amsterdam", "America/Sao_Paulo", "America/Santiago", "Australia/Melbourne", "Europe/Vienna", "Europe/London", "Asia/Seoul")
 
 gglobalclocks:::date_time_tz_to_tzs(
-  from_date_time = "2024-03-06 12:00:00",
-  from_tz = "US/Mountain",
+  from_date_time = "2024-06-27 12:00:00",
+  from_tz = "Europe/London",
   to_tz = tz_targets)
 
 df <- gglobalclocks:::date_time_tz_to_tzs(
-  from_date_time = "2024-03-06 12:00:00",
-  from_tz = "US/Mountain",
+  from_date_time = "2024-06-12 20:00:00",
+  from_tz = "Europe/London",
   to_tz = tz_targets) |> 
   gglobalclocks:::local_tzs_df_collapse()
 

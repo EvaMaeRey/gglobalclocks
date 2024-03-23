@@ -36,38 +36,45 @@ gglobalclocks:::date_time_tz_to_tzs() |>
 
 ``` r
   
-tz_targets <- c("US/Mountain","US/Eastern","US/Eastern", "Europe/Paris", "Europe/Amsterdam", "America/Sao_Paulo", "America/Santiago", "Australia/Melbourne")
+tz_targets <- c("US/Mountain","US/Eastern","US/Pacific", "Europe/Paris", "Europe/Amsterdam", "America/Sao_Paulo", "America/Santiago", "Australia/Melbourne", "Europe/Vienna", "Europe/London", "Asia/Seoul")
 
 gglobalclocks:::date_time_tz_to_tzs(
-  from_date_time = "2024-03-06 12:00:00",
-  from_tz = "US/Mountain",
+  from_date_time = "2024-06-27 12:00:00",
+  from_tz = "Europe/London",
   to_tz = tz_targets)
-#> # A tibble: 7 × 6
-#>   tz        local_time_date_utc local_time local_date local_wday local_wday_date
-#>   <chr>     <dttm>              <time>     <date>     <ord>      <chr>          
-#> 1 US/Mount… 2024-03-06 12:00:00 12:00      2024-03-06 Wed        Wed, Mar 6     
-#> 2 US/Easte… 2024-03-06 14:00:00 14:00      2024-03-06 Wed        Wed, Mar 6     
-#> 3 America/… 2024-03-06 16:00:00 16:00      2024-03-06 Wed        Wed, Mar 6     
-#> 4 America/… 2024-03-06 16:00:00 16:00      2024-03-06 Wed        Wed, Mar 6     
-#> 5 Europe/A… 2024-03-06 20:00:00 20:00      2024-03-06 Wed        Wed, Mar 6     
-#> 6 Europe/P… 2024-03-06 20:00:00 20:00      2024-03-06 Wed        Wed, Mar 6     
-#> 7 Australi… 2024-03-07 06:00:00 06:00      2024-03-07 Thu        Thu, Mar 7
+#> # A tibble: 11 × 6
+#>    tz       local_time_date_utc local_time local_date local_wday local_wday_date
+#>    <chr>    <dttm>              <time>     <date>     <ord>      <chr>          
+#>  1 US/Paci… 2024-06-27 04:00:00 04:00      2024-06-27 Thu        Thu, Jun 27    
+#>  2 US/Moun… 2024-06-27 05:00:00 05:00      2024-06-27 Thu        Thu, Jun 27    
+#>  3 America… 2024-06-27 07:00:00 07:00      2024-06-27 Thu        Thu, Jun 27    
+#>  4 US/East… 2024-06-27 07:00:00 07:00      2024-06-27 Thu        Thu, Jun 27    
+#>  5 America… 2024-06-27 08:00:00 08:00      2024-06-27 Thu        Thu, Jun 27    
+#>  6 Europe/… 2024-06-27 12:00:00 12:00      2024-06-27 Thu        Thu, Jun 27    
+#>  7 Europe/… 2024-06-27 13:00:00 13:00      2024-06-27 Thu        Thu, Jun 27    
+#>  8 Europe/… 2024-06-27 13:00:00 13:00      2024-06-27 Thu        Thu, Jun 27    
+#>  9 Europe/… 2024-06-27 13:00:00 13:00      2024-06-27 Thu        Thu, Jun 27    
+#> 10 Asia/Se… 2024-06-27 20:00:00 20:00      2024-06-27 Thu        Thu, Jun 27    
+#> 11 Austral… 2024-06-27 21:00:00 21:00      2024-06-27 Thu        Thu, Jun 27
 
 df <- gglobalclocks:::date_time_tz_to_tzs(
-  from_date_time = "2024-03-06 12:00:00",
-  from_tz = "US/Mountain",
+  from_date_time = "2024-06-12 20:00:00",
+  from_tz = "Europe/London",
   to_tz = tz_targets) |> 
   gglobalclocks:::local_tzs_df_collapse()
 
 df
-#> # A tibble: 5 × 4
-#>   locations           local_time local_wday_date location           
-#>   <chr>               <time>     <chr>           <fct>              
-#> 1 US/Mountain         12:00      Wed, Mar 6      US/Mountain        
-#> 2 US/Eastern          14:00      Wed, Mar 6      US/Eastern         
-#> 3 Santiago; Sao_Paulo 16:00      Wed, Mar 6      Santiago; Sao_Paulo
-#> 4 Amsterdam; Paris    20:00      Wed, Mar 6      Amsterdam; Paris   
-#> 5 Melbourne           06:00      Thu, Mar 7      Melbourne
+#> # A tibble: 8 × 4
+#>   locations                local_time local_wday_date location                
+#>   <chr>                    <time>     <chr>           <fct>                   
+#> 1 US/Pacific               12:00      Wed, Jun 12     US/Pacific              
+#> 2 US/Mountain              13:00      Wed, Jun 12     US/Mountain             
+#> 3 Santiago; US/Eastern     15:00      Wed, Jun 12     Santiago; US/Eastern    
+#> 4 Sao_Paulo                16:00      Wed, Jun 12     Sao_Paulo               
+#> 5 London                   20:00      Wed, Jun 12     London                  
+#> 6 Amsterdam; Paris; Vienna 21:00      Wed, Jun 12     Amsterdam; Paris; Vienna
+#> 7 Asia/Seoul               04:00      Thu, Jun 13     Asia/Seoul              
+#> 8 Melbourne                05:00      Thu, Jun 13     Melbourne
 
 df |>  
   ggplot() + 
@@ -698,26 +705,26 @@ pkgdown::build_site()
 
 ``` r
 readLines("DESCRIPTION")
-#>  [1] "Package: gglobalclocks"                                                           
-#>  [2] "Title: Create a Wall of Clocks with the Local Time for Locations Around the World"
-#>  [3] "Version: 0.0.0.9000"                                                              
-#>  [4] "Authors@R: "                                                                      
-#>  [5] "    person(given = \"Gina\","                                                     
-#>  [6] "           family = \"Reynolds\","                                                
-#>  [7] "           role = c(\"aut\", \"cre\"),"                                           
-#>  [8] "           email = \"first.last@example.com\","                                   
-#>  [9] "           comment = c(ORCID = \"YOUR-ORCID-ID\"))"                               
-#> [10] "Description: What the package does (one paragraph)."                              
-#> [11] "License: MIT + file LICENSE"                                                      
-#> [12] "Encoding: UTF-8"                                                                  
-#> [13] "LazyData: true"                                                                   
-#> [14] "Roxygen: list(markdown = TRUE)"                                                   
-#> [15] "RoxygenNote: 7.1.1"                                                               
-#> [16] "Imports: "                                                                        
-#> [17] "    dplyr,"                                                                       
-#> [18] "    hms,"                                                                         
-#> [19] "    lubridate,"                                                                   
-#> [20] "    purrr,"                                                                       
+#>  [1] "Package: gglobalclocks"                                                            
+#>  [2] "Title: Create a Wall of Clocks with the Local Times for Locations Around the World"
+#>  [3] "Version: 0.0.0.9000"                                                               
+#>  [4] "Authors@R: "                                                                       
+#>  [5] "    person(given = \"Gina\","                                                      
+#>  [6] "           family = \"Reynolds\","                                                 
+#>  [7] "           role = c(\"aut\", \"cre\"),"                                            
+#>  [8] "           email = \"first.last@example.com\","                                    
+#>  [9] "           comment = c(ORCID = \"YOUR-ORCID-ID\"))"                                
+#> [10] "Description: What the package does (one paragraph)."                               
+#> [11] "License: MIT + file LICENSE"                                                       
+#> [12] "Encoding: UTF-8"                                                                   
+#> [13] "LazyData: true"                                                                    
+#> [14] "Roxygen: list(markdown = TRUE)"                                                    
+#> [15] "RoxygenNote: 7.1.1"                                                                
+#> [16] "Imports: "                                                                         
+#> [17] "    dplyr,"                                                                        
+#> [18] "    hms,"                                                                          
+#> [19] "    lubridate,"                                                                    
+#> [20] "    purrr,"                                                                        
 #> [21] "    tidyr"
 ```
 

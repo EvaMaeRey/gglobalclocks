@@ -83,38 +83,45 @@
 <p><img src="reference/figures/README-unnamed-chunk-2-1.png" width="100%"></p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span>  </span>
-<span><span class="va">tz_targets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"US/Mountain"</span>,<span class="st">"US/Eastern"</span>,<span class="st">"US/Eastern"</span>, <span class="st">"Europe/Paris"</span>, <span class="st">"Europe/Amsterdam"</span>, <span class="st">"America/Sao_Paulo"</span>, <span class="st">"America/Santiago"</span>, <span class="st">"Australia/Melbourne"</span><span class="op">)</span></span>
+<span><span class="va">tz_targets</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"US/Mountain"</span>,<span class="st">"US/Eastern"</span>,<span class="st">"US/Pacific"</span>, <span class="st">"Europe/Paris"</span>, <span class="st">"Europe/Amsterdam"</span>, <span class="st">"America/Sao_Paulo"</span>, <span class="st">"America/Santiago"</span>, <span class="st">"Australia/Melbourne"</span>, <span class="st">"Europe/Vienna"</span>, <span class="st">"Europe/London"</span>, <span class="st">"Asia/Seoul"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu">gglobalclocks</span><span class="fu">:::</span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span></span>
-<span>  from_date_time <span class="op">=</span> <span class="st">"2024-03-06 12:00:00"</span>,</span>
-<span>  from_tz <span class="op">=</span> <span class="st">"US/Mountain"</span>,</span>
+<span>  from_date_time <span class="op">=</span> <span class="st">"2024-06-27 12:00:00"</span>,</span>
+<span>  from_tz <span class="op">=</span> <span class="st">"Europe/London"</span>,</span>
 <span>  to_tz <span class="op">=</span> <span class="va">tz_targets</span><span class="op">)</span></span>
-<span><span class="co">#&gt; # A tibble: 7 × 6</span></span>
-<span><span class="co">#&gt;   tz        local_time_date_utc local_time local_date local_wday local_wday_date</span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;     &lt;dttm&gt;              &lt;time&gt;     &lt;date&gt;     &lt;ord&gt;      &lt;chr&gt;          </span></span>
-<span><span class="co">#&gt; 1 US/Mount… 2024-03-06 12:00:00 12:00      2024-03-06 Wed        Wed, Mar 6     </span></span>
-<span><span class="co">#&gt; 2 US/Easte… 2024-03-06 14:00:00 14:00      2024-03-06 Wed        Wed, Mar 6     </span></span>
-<span><span class="co">#&gt; 3 America/… 2024-03-06 16:00:00 16:00      2024-03-06 Wed        Wed, Mar 6     </span></span>
-<span><span class="co">#&gt; 4 America/… 2024-03-06 16:00:00 16:00      2024-03-06 Wed        Wed, Mar 6     </span></span>
-<span><span class="co">#&gt; 5 Europe/A… 2024-03-06 20:00:00 20:00      2024-03-06 Wed        Wed, Mar 6     </span></span>
-<span><span class="co">#&gt; 6 Europe/P… 2024-03-06 20:00:00 20:00      2024-03-06 Wed        Wed, Mar 6     </span></span>
-<span><span class="co">#&gt; 7 Australi… 2024-03-07 06:00:00 06:00      2024-03-07 Thu        Thu, Mar 7</span></span>
+<span><span class="co">#&gt; # A tibble: 11 × 6</span></span>
+<span><span class="co">#&gt;    tz       local_time_date_utc local_time local_date local_wday local_wday_date</span></span>
+<span><span class="co">#&gt;    &lt;chr&gt;    &lt;dttm&gt;              &lt;time&gt;     &lt;date&gt;     &lt;ord&gt;      &lt;chr&gt;          </span></span>
+<span><span class="co">#&gt;  1 US/Paci… 2024-06-27 04:00:00 04:00      2024-06-27 Thu        Thu, Jun 27    </span></span>
+<span><span class="co">#&gt;  2 US/Moun… 2024-06-27 05:00:00 05:00      2024-06-27 Thu        Thu, Jun 27    </span></span>
+<span><span class="co">#&gt;  3 America… 2024-06-27 07:00:00 07:00      2024-06-27 Thu        Thu, Jun 27    </span></span>
+<span><span class="co">#&gt;  4 US/East… 2024-06-27 07:00:00 07:00      2024-06-27 Thu        Thu, Jun 27    </span></span>
+<span><span class="co">#&gt;  5 America… 2024-06-27 08:00:00 08:00      2024-06-27 Thu        Thu, Jun 27    </span></span>
+<span><span class="co">#&gt;  6 Europe/… 2024-06-27 12:00:00 12:00      2024-06-27 Thu        Thu, Jun 27    </span></span>
+<span><span class="co">#&gt;  7 Europe/… 2024-06-27 13:00:00 13:00      2024-06-27 Thu        Thu, Jun 27    </span></span>
+<span><span class="co">#&gt;  8 Europe/… 2024-06-27 13:00:00 13:00      2024-06-27 Thu        Thu, Jun 27    </span></span>
+<span><span class="co">#&gt;  9 Europe/… 2024-06-27 13:00:00 13:00      2024-06-27 Thu        Thu, Jun 27    </span></span>
+<span><span class="co">#&gt; 10 Asia/Se… 2024-06-27 20:00:00 20:00      2024-06-27 Thu        Thu, Jun 27    </span></span>
+<span><span class="co">#&gt; 11 Austral… 2024-06-27 21:00:00 21:00      2024-06-27 Thu        Thu, Jun 27</span></span>
 <span></span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">gglobalclocks</span><span class="fu">:::</span><span class="fu">date_time_tz_to_tzs</span><span class="op">(</span></span>
-<span>  from_date_time <span class="op">=</span> <span class="st">"2024-03-06 12:00:00"</span>,</span>
-<span>  from_tz <span class="op">=</span> <span class="st">"US/Mountain"</span>,</span>
+<span>  from_date_time <span class="op">=</span> <span class="st">"2024-06-12 20:00:00"</span>,</span>
+<span>  from_tz <span class="op">=</span> <span class="st">"Europe/London"</span>,</span>
 <span>  to_tz <span class="op">=</span> <span class="va">tz_targets</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu">gglobalclocks</span><span class="fu">:::</span><span class="fu">local_tzs_df_collapse</span><span class="op">(</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">df</span></span>
-<span><span class="co">#&gt; # A tibble: 5 × 4</span></span>
-<span><span class="co">#&gt;   locations           local_time local_wday_date location           </span></span>
-<span><span class="co">#&gt;   &lt;chr&gt;               &lt;time&gt;     &lt;chr&gt;           &lt;fct&gt;              </span></span>
-<span><span class="co">#&gt; 1 US/Mountain         12:00      Wed, Mar 6      US/Mountain        </span></span>
-<span><span class="co">#&gt; 2 US/Eastern          14:00      Wed, Mar 6      US/Eastern         </span></span>
-<span><span class="co">#&gt; 3 Santiago; Sao_Paulo 16:00      Wed, Mar 6      Santiago; Sao_Paulo</span></span>
-<span><span class="co">#&gt; 4 Amsterdam; Paris    20:00      Wed, Mar 6      Amsterdam; Paris   </span></span>
-<span><span class="co">#&gt; 5 Melbourne           06:00      Thu, Mar 7      Melbourne</span></span>
+<span><span class="co">#&gt; # A tibble: 8 × 4</span></span>
+<span><span class="co">#&gt;   locations                local_time local_wday_date location                </span></span>
+<span><span class="co">#&gt;   &lt;chr&gt;                    &lt;time&gt;     &lt;chr&gt;           &lt;fct&gt;                   </span></span>
+<span><span class="co">#&gt; 1 US/Pacific               12:00      Wed, Jun 12     US/Pacific              </span></span>
+<span><span class="co">#&gt; 2 US/Mountain              13:00      Wed, Jun 12     US/Mountain             </span></span>
+<span><span class="co">#&gt; 3 Santiago; US/Eastern     15:00      Wed, Jun 12     Santiago; US/Eastern    </span></span>
+<span><span class="co">#&gt; 4 Sao_Paulo                16:00      Wed, Jun 12     Sao_Paulo               </span></span>
+<span><span class="co">#&gt; 5 London                   20:00      Wed, Jun 12     London                  </span></span>
+<span><span class="co">#&gt; 6 Amsterdam; Paris; Vienna 21:00      Wed, Jun 12     Amsterdam; Paris; Vienna</span></span>
+<span><span class="co">#&gt; 7 Asia/Seoul               04:00      Thu, Jun 13     Asia/Seoul              </span></span>
+<span><span class="co">#&gt; 8 Melbourne                05:00      Thu, Jun 13     Melbourne</span></span>
 <span></span>
 <span><span class="va">df</span> <span class="op">|&gt;</span>  </span>
 <span>  <span class="fu"><a href="https://ggplot2.tidyverse.org/reference/ggplot.html" class="external-link">ggplot</a></span><span class="op">(</span><span class="op">)</span> <span class="op">+</span> </span>
@@ -774,26 +781,26 @@
 </h2>
 <div class="sourceCode" id="cb35"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/readLines.html" class="external-link">readLines</a></span><span class="op">(</span><span class="st">"DESCRIPTION"</span><span class="op">)</span></span>
-<span><span class="co">#&gt;  [1] "Package: gglobalclocks"                                                           </span></span>
-<span><span class="co">#&gt;  [2] "Title: Create a Wall of Clocks with the Local Time for Locations Around the World"</span></span>
-<span><span class="co">#&gt;  [3] "Version: 0.0.0.9000"                                                              </span></span>
-<span><span class="co">#&gt;  [4] "Authors@R: "                                                                      </span></span>
-<span><span class="co">#&gt;  [5] "    person(given = \"Gina\","                                                     </span></span>
-<span><span class="co">#&gt;  [6] "           family = \"Reynolds\","                                                </span></span>
-<span><span class="co">#&gt;  [7] "           role = c(\"aut\", \"cre\"),"                                           </span></span>
-<span><span class="co">#&gt;  [8] "           email = \"first.last@example.com\","                                   </span></span>
-<span><span class="co">#&gt;  [9] "           comment = c(ORCID = \"YOUR-ORCID-ID\"))"                               </span></span>
-<span><span class="co">#&gt; [10] "Description: What the package does (one paragraph)."                              </span></span>
-<span><span class="co">#&gt; [11] "License: MIT + file LICENSE"                                                      </span></span>
-<span><span class="co">#&gt; [12] "Encoding: UTF-8"                                                                  </span></span>
-<span><span class="co">#&gt; [13] "LazyData: true"                                                                   </span></span>
-<span><span class="co">#&gt; [14] "Roxygen: list(markdown = TRUE)"                                                   </span></span>
-<span><span class="co">#&gt; [15] "RoxygenNote: 7.1.1"                                                               </span></span>
-<span><span class="co">#&gt; [16] "Imports: "                                                                        </span></span>
-<span><span class="co">#&gt; [17] "    dplyr,"                                                                       </span></span>
-<span><span class="co">#&gt; [18] "    hms,"                                                                         </span></span>
-<span><span class="co">#&gt; [19] "    lubridate,"                                                                   </span></span>
-<span><span class="co">#&gt; [20] "    purrr,"                                                                       </span></span>
+<span><span class="co">#&gt;  [1] "Package: gglobalclocks"                                                            </span></span>
+<span><span class="co">#&gt;  [2] "Title: Create a Wall of Clocks with the Local Times for Locations Around the World"</span></span>
+<span><span class="co">#&gt;  [3] "Version: 0.0.0.9000"                                                               </span></span>
+<span><span class="co">#&gt;  [4] "Authors@R: "                                                                       </span></span>
+<span><span class="co">#&gt;  [5] "    person(given = \"Gina\","                                                      </span></span>
+<span><span class="co">#&gt;  [6] "           family = \"Reynolds\","                                                 </span></span>
+<span><span class="co">#&gt;  [7] "           role = c(\"aut\", \"cre\"),"                                            </span></span>
+<span><span class="co">#&gt;  [8] "           email = \"first.last@example.com\","                                    </span></span>
+<span><span class="co">#&gt;  [9] "           comment = c(ORCID = \"YOUR-ORCID-ID\"))"                                </span></span>
+<span><span class="co">#&gt; [10] "Description: What the package does (one paragraph)."                               </span></span>
+<span><span class="co">#&gt; [11] "License: MIT + file LICENSE"                                                       </span></span>
+<span><span class="co">#&gt; [12] "Encoding: UTF-8"                                                                   </span></span>
+<span><span class="co">#&gt; [13] "LazyData: true"                                                                    </span></span>
+<span><span class="co">#&gt; [14] "Roxygen: list(markdown = TRUE)"                                                    </span></span>
+<span><span class="co">#&gt; [15] "RoxygenNote: 7.1.1"                                                                </span></span>
+<span><span class="co">#&gt; [16] "Imports: "                                                                         </span></span>
+<span><span class="co">#&gt; [17] "    dplyr,"                                                                        </span></span>
+<span><span class="co">#&gt; [18] "    hms,"                                                                          </span></span>
+<span><span class="co">#&gt; [19] "    lubridate,"                                                                    </span></span>
+<span><span class="co">#&gt; [20] "    purrr,"                                                                        </span></span>
 <span><span class="co">#&gt; [21] "    tidyr"</span></span></code></pre></div>
 </div>
 <div class="section level2">
