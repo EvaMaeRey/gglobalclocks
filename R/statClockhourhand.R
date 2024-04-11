@@ -3,9 +3,10 @@
 compute_clock_hands <- function(data){
   
   data |> 
-  dplyr::mutate(minute_turn = local_time %>% lubridate::minute() %% 60 / 60) |> 
-  dplyr::mutate(hour_turn = local_time %>% lubridate::hour() %% 12/12 + minute_turn/12) |>
-  dplyr::mutate(am_pm = ifelse(local_time %>% lubridate::hour() > 12, "pm", "am")) 
+  dplyr::mutate(local_time_hms = local_time_hm %>% paste0(":00") %>% hms::as_hms() ) |>
+  dplyr::mutate(minute_turn = local_time_hms %>% lubridate::minute() %% 60 / 60) |> 
+  dplyr::mutate(hour_turn = local_time_hms %>% lubridate::hour() %% 12/12 + minute_turn/12) |>
+  dplyr::mutate(am_pm = ifelse(local_time_hms %>% lubridate::hour() > 12, "pm", "am")) 
   
 }
 

@@ -32,21 +32,21 @@ library(tidyverse)
 gglobalclocks:::date_time_tz_to_tzs() |> 
   gglobalclocks:::local_tzs_df_collapse() |>
   gglobalclocks:::gglobalclocks() + 
-    aes(local_time = local_time) + 
+    aes(local_time_hm = local_time_hm) + 
     gglobalclocks:::stamp_clockface() + 
     gglobalclocks:::geom_clock_hands() + 
     facet_wrap(~str_wrap(locations, 20))
   
-tz_targets <- c("US/Mountain","US/Eastern","US/Pacific", "Europe/Paris", "Europe/Amsterdam", "America/Sao_Paulo", "America/Santiago", "Australia/Melbourne", "Europe/Vienna", "Europe/London", "Asia/Seoul")
+tz_targets <- c("US/Mountain","US/Eastern","US/Pacific",  "Europe/Amsterdam", "America/Sao_Paulo", "America/Santiago", "Australia/Adelaide","Australia/Melbourne", "Europe/Vienna", "Europe/London", "Asia/Seoul")
 
 gglobalclocks:::date_time_tz_to_tzs(
-  from_date_time = "2024-06-27 12:00:00",
-  from_tz = "Europe/London",
+  from_date_time = "2024-05-11 10:00:00",
+  from_tz = "US/Eastern",
   to_tz = tz_targets)
 
 df <- gglobalclocks:::date_time_tz_to_tzs(
-  from_date_time = "2024-06-12 20:00:00",
-  from_tz = "Europe/London",
+  from_date_time = "2024-05-11 10:00:01",
+  from_tz = "US/Eastern",
   to_tz = tz_targets) |> 
   gglobalclocks:::local_tzs_df_collapse()
 
@@ -55,10 +55,54 @@ df
 df |>  
   ggplot() + 
   gglobalclocks:::stamp_workday() +
-  aes(local_time, fct_inorder(locations)) + 
-  geom_point() +
-  geom_text(aes(label = local_time)) + 
-  aes(color = local_wday_date)
+  aes(x = local_time_hm %>% paste0(":00") %>% hms::as_hms(), 
+      y = fct_inorder(locations) %>% fct_rev()) + 
+  geom_point(shape = "|", size = 8) +
+  # geom_rect(aes(xmin =  local_time_hm %>% paste0(":00") %>% hms::as_hms(),
+  #           xmax = local_time_hm %>% paste0(":00") %>% hms::as_hms() + minutes(50),
+  #           ymin = fct_inorder(locations) %>% fct_rev() - .25,
+  #           ymax = fct_inorder(locations) %>% fct_rev() + .25))
+  geom_label(aes(label = paste(local_time_hm, ""), 
+                 hjust = hms::as_hms(local_date_time_utc) > hms::as_hms("17:00:00")),  
+             label.size = NA, vjust = .9, alpha = 0) +
+  geom_label(aes(label = fct_inorder(locations) %>% fct_rev(),
+                 hjust = hms::as_hms(local_date_time_utc) > hms::as_hms("17:00:00")),
+             vjust = .1, label.size = NA, alpha = 0) + 
+  aes(color = local_wday_date) +
+  theme(axis.text.y = element_text(hjust = 1, size = 8)) + 
+  scale_fill_manual(values = monochromeR::generate_palette("navy", "go_lighter", 3)) + 
+  labs(x = NULL, y = NULL, fill = NULL, color = NULL) + 
+  theme_classic() + 
+  scale_color_manual(values = c("navy", "goldenrod2")) + 
+  theme_void() + 
+  theme(legend.position = "top", legend.justification = "left")  +
+  geom_label(data = gglobalclocks:::create_day_schedule_df(), 
+            aes(x = time_start, y = 10, 
+                label = time_start %>% str_remove("...$")), 
+            angle = 0, color = "gray",
+            alpha = .95,
+            hjust = -.05, 
+            size = 3,
+            vjust = 1) + 
+  geom_vline(xintercept = "12:00:00" %>% hms::as_hms(), color = "grey", 
+             linetype = "dotted") + 
+  labs(title= "Local start times for ggplot2 extenders Saturday, May 11, 2024 meeting") + 
+  theme(plot.title.position = "plot") + 
+  guides(label = "none", color = "none") + 
+  geom_label(data = . %>% distinct(local_wday_date) %>%
+               mutate(y = c(1,-1)), aes(label =  local_wday_date, y = y/3.5 + 1.5),
+             x = hms::as_hms("05:00:00"), alpha = 0, label.size = 0) + 
+  geom_hline(yintercept = 1.5, color = "goldenrod2", linetype = "dotted")
+
+df |> distinct(local_wday_date)
+  
+  
+gglobalclocks:::create_day_schedule_df()  
+
+# Sys.Date() |> paste0 ("00:00:00") + minutes(50)
+
+# hms::as_hms("00:00:00")
+
 ```
 
 
@@ -88,22 +132,13 @@ We can use the converter above to translate from a 'from' location and time to a
 
 ```{r date_time_tz_to_tzs}
 date_time_tz_to_tzs <- function(from_date_time = "2024-03-27 12:00:00", 
-                                from_tz = "US/Mountain", 
-                                to_tz = c("Europe/Paris", 
-                                          "Europe/Amsterdam", 
+                                from_tz = "US/Eastern", 
+                                to_tz = c("Europe/Amsterdam", 
                                           "Australia/Adelaide",
-                                          "Australia/Melbourne", 
                                           "Europe/Stockholm", 
-                                          "US/Eastern",
-                                          "Europe/London", 
-                                          "US/Pacific",
                                           "US/Mountain", 
-                                          "US/Central", 
-                                          "Australia/Sydney",
-                                          "Europe/Vienna",
-                                          "America/Sao_Paulo",
                                           "America/Santiago",
-                                          "America/Buenos_Aires")){
+                                          "Asia/Seoul")){
 
    meeting <- ymd_hms(from_date_time, 
                       tz = from_tz)
@@ -114,13 +149,14 @@ OlsonNames() %>%
   dplyr::filter(tz %in% to_tz) %>%
   dplyr::mutate(local_date_time_chr = purrr::map2(meeting, tz, time_to_local))  %>%
   tidyr::unnest(local_date_time_chr) %>%
-  dplyr::mutate(local_time_date_utc = 
+  dplyr::mutate(local_date_time_utc = 
                   lubridate::ymd_hms(local_date_time_chr, tz = "UTC"))  %>% 
-  dplyr::mutate(local_time = lubridate::ymd_hms(local_date_time_chr))  %>% 
-  dplyr::mutate(local_time = hms::as_hms(local_time)) %>%
+  # dplyr::mutate(local_time_hms = lubridate::ymd_hms(local_date_time_chr))  %>% 
+  dplyr::mutate(local_time_hms = hms::as_hms(local_date_time_utc)) %>% 
+  dplyr::mutate(local_time_hm = local_time_hms %>% str_remove("...$")) %>%
   dplyr::mutate(local_date = as.Date(local_date_time_chr)) %>%
   dplyr::mutate(local_wday = lubridate::wday(local_date, label = T)) %>%
-  dplyr::arrange(local_date, local_time) %>%
+  dplyr::arrange(local_date, local_time_hm) %>%
   dplyr::select(-local_date_time_chr) %>%
   dplyr::mutate(local_wday_date = paste0(local_wday, ", ", month(local_date, label = T), " ", day(local_date)))
 
@@ -141,14 +177,15 @@ If it turns out that you have multiple tz with the same local meeting time, you 
 local_tzs_df_collapse <- function(local_tzs_df, collapse = "; "){
   
   local_tzs_df |>
-    group_by(local_date, local_time, local_wday_date) |>
+    group_by(local_date, local_date_time_utc, local_time_hm, local_wday_date) |>
     summarise(locations = paste(tz, collapse = collapse)) |>
     ungroup() |>
     select(locations, everything()) |>
     mutate(locations = str_remove_all(locations, "Europe/|America/|Australia/")) |>
-    arrange(local_date, local_time) |>
-    mutate(location = fct_inorder(locations)) |>
-    select(-local_date)
+    arrange(local_date_time_utc) |>
+    mutate(locations = fct_inorder(locations)) |>
+    select(-local_date) |>
+    select(everything(), local_date_time_utc)
   
 }
 ```
@@ -168,6 +205,7 @@ You can of course display in a nicer way, passing to html table maker for exampl
 ```{r}
 date_time_tz_to_tzs() |> 
   local_tzs_df_collapse() |> 
+  select(-local_date_time_utc) |>
   knitr::kable()
 ```
 
@@ -175,13 +213,16 @@ date_time_tz_to_tzs() |>
 ### Let's build a wall of global clocks with base ggplot2
 
 ```{r}
+# local_time_hm_to_hms <- 
+
 date_time_tz_to_tzs() |> 
   local_tzs_df_collapse() |>
-  mutate(minute_turn = local_time %>% 
+  mutate(local_time_hms = local_time_hm %>% paste0(":00") %>% hms::as_hms() ) |>
+  mutate(minute_turn = local_time_hms %>% 
            lubridate::minute() %% 60 / 60) %>% 
-  mutate(hour_turn = local_time %>% 
+  mutate(hour_turn = local_time_hms %>% 
            lubridate::hour() %% 12/12 + minute_turn/12) %>% 
-  mutate(am_pm = ifelse(local_time %>% lubridate::hour() >= 12, "pm", "am")) %>% 
+  mutate(am_pm = ifelse(local_time_hms %>% lubridate::hour() >= 12, "pm", "am")) %>% 
   ggplot() + 
   facet_wrap(~ str_wrap(locations, 15)) + 
   aes(x =  hour_turn, 
@@ -228,7 +269,7 @@ stamp_clockface <- function(){
   
     list(ggplot2::geom_text(data = data.frame(x = 1:12, y = 1), 
             ggplot2::aes(label = x, x = x/12, y = y, xend = NULL, 
-                yend = NULL, color = NULL, local_time = NULL),
+                yend = NULL, color = NULL, local_time_hm = NULL),
             show.legend = F),
           ggplot2::annotate(geom = "segment", x = 0, xend = 1, y = 1.2, yend = 1.2)
          
@@ -250,9 +291,10 @@ gglobalclocks() + stamp_clockface()
 compute_clock_hands <- function(data){
   
   data |> 
-  dplyr::mutate(minute_turn = local_time %>% lubridate::minute() %% 60 / 60) |> 
-  dplyr::mutate(hour_turn = local_time %>% lubridate::hour() %% 12/12 + minute_turn/12) |>
-  dplyr::mutate(am_pm = ifelse(local_time %>% lubridate::hour() > 12, "pm", "am")) 
+  dplyr::mutate(local_time_hms = local_time_hm %>% paste0(":00") %>% hms::as_hms() ) |>
+  dplyr::mutate(minute_turn = local_time_hms %>% lubridate::minute() %% 60 / 60) |> 
+  dplyr::mutate(hour_turn = local_time_hms %>% lubridate::hour() %% 12/12 + minute_turn/12) |>
+  dplyr::mutate(am_pm = ifelse(local_time_hms %>% lubridate::hour() > 12, "pm", "am")) 
   
 }
 
@@ -319,6 +361,7 @@ statClockhourhand <- ggplot2::ggproto(`_class` = "statClockhourhand",
 ```{r}
 date_time_tz_to_tzs() |> compute_clock_hands()
 date_time_tz_to_tzs() |> compute_minute_hand()
+date_time_tz_to_tzs() |> compute_hour_hand()
 ```
 
 ### `geom_clock_hands()`
@@ -358,7 +401,7 @@ geom_clock_hands <- function(...){
 date_time_tz_to_tzs() |>
   local_tzs_df_collapse() |>
 gglobalclocks() +
-  aes(local_time = local_time) +
+  aes(local_time_hm = local_time_hm) +
   stamp_clockface() +
   geom_minute_hand() +
   geom_hour_hand() +
@@ -367,7 +410,7 @@ gglobalclocks() +
 date_time_tz_to_tzs() |> 
   local_tzs_df_collapse() |>
   gglobalclocks() + 
-  aes(local_time = local_time) + 
+  aes(local_time_hm = local_time_hm) + 
   stamp_clockface() + 
   geom_clock_hands() + 
   facet_wrap(~locations)
@@ -424,11 +467,11 @@ readme2pkg::chunk_to_r(chunk_name = "stamp_workday")
 date_time_tz_to_tzs() |> 
   local_tzs_df_collapse() |>  
   ggplot() + 
-  aes(local_time, fct_rev(fct_inorder(str_wrap(locations,25)))) + 
+  aes(local_time_hm %>% paste0(":00") %>%  hms::as_hms(), fct_rev(fct_inorder(str_wrap(locations,25)))) + 
   labs(x = "Local meet time", y = NULL) + 
   stamp_workday() +
   geom_point() + 
-  geom_text(aes(label = local_time),
+  geom_text(aes(label = local_time_hm),
             hjust = -.1, show.legend = F) + 
   geom_vline(xintercept = hms::as_hms("12:00:00"),
               linetype = "dashed", color = "grey25",
@@ -492,7 +535,7 @@ devtools::check(pkg = ".")
 ### Bit F. Build package 🚧 ✅
 
 ```{r, eval = F}
-devtools::build()
+devtools::install(upgrade = F)
 ```
 
 
