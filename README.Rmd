@@ -50,7 +50,7 @@ df <- gglobalclocks:::date_time_tz_to_tzs(
   to_tz = tz_targets) |> 
   gglobalclocks:::local_tzs_df_collapse()
 
-df
+df |> select(-local_date_time_utc)
 
 df |>  
   ggplot() + 

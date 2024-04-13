@@ -69,19 +69,19 @@ df <- gglobalclocks:::date_time_tz_to_tzs(
   to_tz = tz_targets) |> 
   gglobalclocks:::local_tzs_df_collapse()
 
-df
-#> # A tibble: 9 × 4
-#>   locations            local_date_time_utc local_time_hm local_wday_date
-#>   <fct>                <dttm>              <chr>         <chr>          
-#> 1 US/Pacific           2024-05-11 07:00:01 07:00         Sat, May 11    
-#> 2 US/Mountain          2024-05-11 08:00:01 08:00         Sat, May 11    
-#> 3 Santiago; US/Eastern 2024-05-11 10:00:01 10:00         Sat, May 11    
-#> 4 Sao_Paulo            2024-05-11 11:00:01 11:00         Sat, May 11    
-#> 5 London               2024-05-11 15:00:01 15:00         Sat, May 11    
-#> 6 Amsterdam; Vienna    2024-05-11 16:00:01 16:00         Sat, May 11    
-#> 7 Asia/Seoul           2024-05-11 23:00:01 23:00         Sat, May 11    
-#> 8 Adelaide             2024-05-11 23:30:01 23:30         Sat, May 11    
-#> 9 Melbourne            2024-05-12 00:00:01 00:00         Sun, May 12
+df |> select(-local_date_time_utc)
+#> # A tibble: 9 × 3
+#>   locations            local_time_hm local_wday_date
+#>   <fct>                <chr>         <chr>          
+#> 1 US/Pacific           07:00         Sat, May 11    
+#> 2 US/Mountain          08:00         Sat, May 11    
+#> 3 Santiago; US/Eastern 10:00         Sat, May 11    
+#> 4 Sao_Paulo            11:00         Sat, May 11    
+#> 5 London               15:00         Sat, May 11    
+#> 6 Amsterdam; Vienna    16:00         Sat, May 11    
+#> 7 Asia/Seoul           23:00         Sat, May 11    
+#> 8 Adelaide             23:30         Sat, May 11    
+#> 9 Melbourne            00:00         Sun, May 12
 
 df |>  
   ggplot() + 
